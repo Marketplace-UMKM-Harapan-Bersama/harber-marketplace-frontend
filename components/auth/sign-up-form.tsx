@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { authService } from "@/lib/auth-service";
 import { signUpSchema, type Role } from "@/lib/schema";
@@ -60,19 +61,47 @@ export function SignUpForm({
       province: "",
       postal_code: "",
       role,
-      shop_name: "",
-      shop_url: "",
-      shop_description: "",
+      ...(role === "seller"
+        ? {
+            shop_name: "",
+            shop_url: "",
+            shop_description: "",
+          }
+        : {}),
     },
   });
 
   const onSubmit = async (data: FormData) => {
     try {
       setIsLoading(true);
-      await authService.signUp(data);
+
+      // Prepare the submission data
+      const submissionData = {
+        ...data,
+        role,
+      };
+
+      // Remove seller fields if customer
+      if (role === "customer") {
+        delete submissionData.shop_name;
+        delete submissionData.shop_url;
+        delete submissionData.shop_description;
+      }
+
+      // Submit the form
+      await authService.signUp(submissionData);
+
+      toast.success(
+        role === "seller"
+          ? "Pendaftaran berhasil! Silakan tunggu verifikasi dari admin."
+          : "Pendaftaran berhasil! Silakan masuk."
+      );
       router.push("/sign-in");
     } catch (error) {
       console.error(error);
+      toast.error(
+        "Gagal mendaftar. Silakan periksa kembali data Anda dan coba lagi."
+      );
     } finally {
       setIsLoading(false);
     }

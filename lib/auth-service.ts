@@ -10,7 +10,9 @@ const api = axios.create({
 
 export const authService = {
   async signUp(data: SignUpFormValues) {
-    const response = await api.post("/api/register-seller", data);
+    const endpoint =
+      data.role === "seller" ? "/api/register-seller" : "/api/register";
+    const response = await api.post(endpoint, data);
     return response.data;
   },
 
