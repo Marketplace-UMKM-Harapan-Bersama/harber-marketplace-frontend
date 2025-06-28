@@ -5,12 +5,14 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
   headers: {
     "Content-Type": "application/json",
+    CLIENT_ID: process.env.NEXT_PUBLIC_CLIENT_ID || "",
+    CLIENT_SECRET: process.env.NEXT_PUBLIC_CLIENT_SECRET || "",
   },
 });
 
 export const authService = {
   async signUp(data: SignUpFormValues) {
-    const endpoint = "api/register";
+    const endpoint = "/api/register";
     const response = await api.post(endpoint, data);
     return response.data;
   },
