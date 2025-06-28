@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { GalleryVerticalEnd } from "lucide-react";
 import { useForm } from "react-hook-form";
 
-import { authService } from "@/lib/auth-service";
+import { authService } from "@/lib/api";
 import { SignInFormValues, signInSchema } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

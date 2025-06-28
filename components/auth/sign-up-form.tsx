@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { authService } from "@/lib/auth-service";
+import { authService } from "@/lib/api";
 import { signUpSchema, type Role } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

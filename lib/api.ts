@@ -19,6 +19,9 @@ export const authService = {
 
   async signIn(data: SignInFormValues) {
     const response = await api.post("/api/login", data);
+    // Simpan access_token
+    localStorage.setItem("access_token", response.data.access_token);
+
     return response.data;
   },
 
@@ -27,3 +30,14 @@ export const authService = {
     return response.data;
   },
 };
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
