@@ -1,11 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { FolderSyncIcon as Sync } from "lucide-react"
-import { Switch } from "@/components/ui/switch"
-// import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
+import { Switch } from "@/components/ui/switch"
 
 interface ProductSyncToggleProps {
   productId: string
@@ -20,7 +17,7 @@ export function ProductSyncToggle({
   productName,
   isSync,
   onSyncChange,
-  lastSyncAt,
+  // lastSyncAt,
 }: ProductSyncToggleProps) {
   const [loading, setLoading] = React.useState(false)
 
@@ -44,22 +41,6 @@ export function ProductSyncToggle({
     <div className="flex items-center justify-between space-x-2">
       <div className="flex items-center space-x-2">
         <Switch id={`sync-${productId}`} checked={isSync} onCheckedChange={handleSyncToggle} disabled={loading} />
-        {/* <Label htmlFor={`sync-${productId}`} className="text-sm font-medium">
-          Sinkronisasi ke Marketplace
-        </Label> */}
-      </div>
-      <div className="flex items-center space-x-2">
-        {isSync && (
-          <Badge variant="secondary" className="text-xs">
-            <Sync className="w-3 h-3 mr-1" />
-            Aktif
-          </Badge>
-        )}
-        {lastSyncAt && (
-          <span className="text-xs text-muted-foreground">
-            Terakhir sync: {new Date(lastSyncAt).toLocaleString("id-ID")}
-          </span>
-        )}
       </div>
     </div>
   )

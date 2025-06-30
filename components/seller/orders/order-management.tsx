@@ -1,66 +1,114 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Clock, Package, Truck, CheckCircle, Search, Filter } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TrackingInput } from "./tracking-input"
+import * as React from "react";
+import {
+  Clock,
+  Package,
+  Truck,
+  CheckCircle,
+  Search,
+  Filter,
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TrackingInput } from "../shipping/tracking-input";
 
 interface Order {
-  id: string
-  orderNumber: string
-  customerName: string
+  id: string;
+  orderNumber: string;
+  customerName: string;
   products: Array<{
-    name: string
-    quantity: number
-    price: number
-  }>
-  totalAmount: number
-  status: "pending" | "processing" | "shipped" | "delivered" | "completed"
-  createdAt: string
-  trackingNumber?: string
-  courier?: string
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
+  totalAmount: number;
+  status: "pending" | "processing" | "shipped" | "delivered" | "completed";
+  createdAt: string;
+  trackingNumber?: string;
+  courier?: string;
 }
 
 interface OrderManagementProps {
-  orders: Order[]
-  onStatusUpdate: (orderId: string, status: string) => Promise<void>
-  onTrackingUpdate: (orderId: string, trackingNumber: string, courier: string) => Promise<void>
+  orders: Order[];
+  onStatusUpdate: (orderId: string, status: string) => Promise<void>;
+  onTrackingUpdate: (
+    orderId: string,
+    trackingNumber: string,
+    courier: string
+  ) => Promise<void>;
 }
 
 const statusConfig = {
-  pending: { label: "Menunggu Proses", icon: Clock, variant: "secondary" as const },
-  processing: { label: "Sedang Diproses", icon: Package, variant: "default" as const },
-  shipped: { label: "Sedang Dikirim", icon: Truck, variant: "default" as const },
-  delivered: { label: "Diterima", icon: CheckCircle, variant: "default" as const },
-  completed: { label: "Selesai", icon: CheckCircle, variant: "default" as const },
-}
+  pending: {
+    label: "Menunggu Proses",
+    icon: Clock,
+    variant: "secondary" as const,
+  },
+  processing: {
+    label: "Sedang Diproses",
+    icon: Package,
+    variant: "default" as const,
+  },
+  shipped: {
+    label: "Sedang Dikirim",
+    icon: Truck,
+    variant: "default" as const,
+  },
+  delivered: {
+    label: "Diterima",
+    icon: CheckCircle,
+    variant: "default" as const,
+  },
+  completed: {
+    label: "Selesai",
+    icon: CheckCircle,
+    variant: "default" as const,
+  },
+};
 
-export function OrderManagement({ orders, onStatusUpdate, onTrackingUpdate }: OrderManagementProps) {
-  const [searchTerm, setSearchTerm] = React.useState("")
-  const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null)
+export function OrderManagement({
+  orders,
+  onStatusUpdate,
+  onTrackingUpdate,
+}: OrderManagementProps) {
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null);
 
   const filterOrdersByStatus = (status?: string) => {
-    let filtered = orders
+    let filtered = orders;
 
     if (status) {
-      filtered = filtered.filter((order) => order.status === status)
+      filtered = filtered.filter((order) => order.status === status);
     }
 
     if (searchTerm) {
       filtered = filtered.filter(
         (order) =>
           order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          order.customerName.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
+          order.customerName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
 
-    return filtered
-  }
+    return filtered;
+  };
 
   const OrderTable = ({ orders }: { orders: Order[] }) => (
     <Table>
@@ -77,13 +125,15 @@ export function OrderManagement({ orders, onStatusUpdate, onTrackingUpdate }: Or
       </TableHeader>
       <TableBody>
         {orders.map((order) => {
-          const statusInfo = statusConfig[order.status]
-          const StatusIcon = statusInfo.icon
+          const statusInfo = statusConfig[order.status];
+          const StatusIcon = statusInfo.icon;
 
           return (
             <TableRow key={order.id}>
               <TableCell>
-                <code className="text-xs bg-muted px-1 py-0.5 rounded">{order.orderNumber}</code>
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                  {order.orderNumber}
+                </code>
               </TableCell>
               <TableCell>{order.customerName}</TableCell>
               <TableCell>
@@ -91,22 +141,30 @@ export function OrderManagement({ orders, onStatusUpdate, onTrackingUpdate }: Or
                   {order.products.length} produk
                   <div className="text-xs text-muted-foreground">
                     {order.products[0]?.name}
-                    {order.products.length > 1 && ` +${order.products.length - 1} lainnya`}
+                    {order.products.length > 1 &&
+                      ` +${order.products.length - 1} lainnya`}
                   </div>
                 </div>
               </TableCell>
-              <TableCell>Rp {order.totalAmount.toLocaleString("id-ID")}</TableCell>
+              <TableCell>
+                Rp {order.totalAmount.toLocaleString("id-ID")}
+              </TableCell>
               <TableCell>
                 <Badge variant={statusInfo.variant}>
                   <StatusIcon className="w-3 h-3 mr-1" />
                   {statusInfo.label}
                 </Badge>
               </TableCell>
-              <TableCell>{new Date(order.createdAt).toLocaleDateString("id-ID")}</TableCell>
+              <TableCell>
+                {new Date(order.createdAt).toLocaleDateString("id-ID")}
+              </TableCell>
               <TableCell>
                 <div className="flex space-x-2">
                   {order.status === "pending" && (
-                    <Button size="sm" onClick={() => onStatusUpdate(order.id, "processing")}>
+                    <Button
+                      size="sm"
+                      onClick={() => onStatusUpdate(order.id, "processing")}
+                    >
                       Proses
                     </Button>
                   )}
@@ -123,19 +181,23 @@ export function OrderManagement({ orders, onStatusUpdate, onTrackingUpdate }: Or
                 </div>
               </TableCell>
             </TableRow>
-          )
+          );
         })}
       </TableBody>
     </Table>
-  )
+  );
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Manajemen Pesanan</h1>
-          <p className="text-muted-foreground">Kelola pesanan dan update status pengiriman</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Manajemen Pesanan
+          </h1>
+          <p className="text-muted-foreground">
+            Kelola pesanan dan update status pengiriman
+          </p>
         </div>
       </div>
 
@@ -160,10 +222,18 @@ export function OrderManagement({ orders, onStatusUpdate, onTrackingUpdate }: Or
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
           <TabsTrigger value="all">Semua ({orders.length})</TabsTrigger>
-          <TabsTrigger value="pending">Menunggu ({filterOrdersByStatus("pending").length})</TabsTrigger>
-          <TabsTrigger value="processing">Diproses ({filterOrdersByStatus("processing").length})</TabsTrigger>
-          <TabsTrigger value="shipped">Dikirim ({filterOrdersByStatus("shipped").length})</TabsTrigger>
-          <TabsTrigger value="completed">Selesai ({filterOrdersByStatus("completed").length})</TabsTrigger>
+          <TabsTrigger value="pending">
+            Menunggu ({filterOrdersByStatus("pending").length})
+          </TabsTrigger>
+          <TabsTrigger value="processing">
+            Diproses ({filterOrdersByStatus("processing").length})
+          </TabsTrigger>
+          <TabsTrigger value="shipped">
+            Dikirim ({filterOrdersByStatus("shipped").length})
+          </TabsTrigger>
+          <TabsTrigger value="completed">
+            Selesai ({filterOrdersByStatus("completed").length})
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="all">
@@ -181,7 +251,9 @@ export function OrderManagement({ orders, onStatusUpdate, onTrackingUpdate }: Or
           <Card>
             <CardHeader>
               <CardTitle>Pesanan Menunggu Proses</CardTitle>
-              <CardDescription>Pesanan yang perlu segera diproses</CardDescription>
+              <CardDescription>
+                Pesanan yang perlu segera diproses
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <OrderTable orders={filterOrdersByStatus("pending")} />
@@ -193,7 +265,9 @@ export function OrderManagement({ orders, onStatusUpdate, onTrackingUpdate }: Or
           <Card>
             <CardHeader>
               <CardTitle>Pesanan Sedang Diproses</CardTitle>
-              <CardDescription>Pesanan yang sedang disiapkan untuk pengiriman</CardDescription>
+              <CardDescription>
+                Pesanan yang sedang disiapkan untuk pengiriman
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <OrderTable orders={filterOrdersByStatus("processing")} />
@@ -205,7 +279,9 @@ export function OrderManagement({ orders, onStatusUpdate, onTrackingUpdate }: Or
           <Card>
             <CardHeader>
               <CardTitle>Pesanan Sedang Dikirim</CardTitle>
-              <CardDescription>Pesanan yang sudah dikirim dan dalam perjalanan</CardDescription>
+              <CardDescription>
+                Pesanan yang sudah dikirim dan dalam perjalanan
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <OrderTable orders={filterOrdersByStatus("shipped")} />
@@ -217,7 +293,9 @@ export function OrderManagement({ orders, onStatusUpdate, onTrackingUpdate }: Or
           <Card>
             <CardHeader>
               <CardTitle>Pesanan Selesai</CardTitle>
-              <CardDescription>Pesanan yang sudah selesai dan diterima pelanggan</CardDescription>
+              <CardDescription>
+                Pesanan yang sudah selesai dan diterima pelanggan
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <OrderTable orders={filterOrdersByStatus("completed")} />
@@ -236,13 +314,17 @@ export function OrderManagement({ orders, onStatusUpdate, onTrackingUpdate }: Or
               currentTrackingNumber={selectedOrder.trackingNumber}
               currentCourier={selectedOrder.courier}
               onTrackingUpdate={async (orderId, trackingNumber, courier) => {
-                await onTrackingUpdate(orderId, trackingNumber, courier)
-                await onStatusUpdate(orderId, "shipped")
-                setSelectedOrder(null)
+                await onTrackingUpdate(orderId, trackingNumber, courier);
+                await onStatusUpdate(orderId, "shipped");
+                setSelectedOrder(null);
               }}
             />
             <div className="p-4 border-t">
-              <Button variant="outline" onClick={() => setSelectedOrder(null)} className="w-full">
+              <Button
+                variant="outline"
+                onClick={() => setSelectedOrder(null)}
+                className="w-full"
+              >
                 Batal
               </Button>
             </div>
@@ -250,5 +332,5 @@ export function OrderManagement({ orders, onStatusUpdate, onTrackingUpdate }: Or
         </div>
       )}
     </div>
-  )
+  );
 }

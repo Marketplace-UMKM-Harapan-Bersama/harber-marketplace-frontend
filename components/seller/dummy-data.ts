@@ -112,7 +112,7 @@ export const dummyCategories: Category[] = [
     description: "Produk makanan dan minuman",
     productCount: 8,
     isSync: false,
-    status: "active",
+    status: "inactive",
   },
   {
     id: "4",
@@ -172,7 +172,7 @@ export const dummyProducts: Product[] = [
     category: "Makanan & Minuman",
     categoryId: "3",
     isSync: false,
-    status: "active",
+    status: "inactive",
     description: "Kopi arabica premium dari pegunungan Jawa",
   },
   {
@@ -197,7 +197,7 @@ export const dummyProducts: Product[] = [
     category: "Olahraga",
     categoryId: "5",
     isSync: false,
-    status: "active",
+    status: "inactive",
     description: "Sepatu running dengan teknologi Air Max",
   },
   {

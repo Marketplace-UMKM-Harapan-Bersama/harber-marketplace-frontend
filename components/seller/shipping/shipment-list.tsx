@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import type { Shipment } from "@/lib/dummy-data"
+import type { Shipment } from "@/components/seller/dummy-data"
 
 interface ShipmentListProps {
   shipments: Shipment[]

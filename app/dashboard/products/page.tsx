@@ -1,27 +1,19 @@
 "use client"
 
 import { AppSidebar } from "@/components/seller/app-sider"
-import { OrderManagement } from "@/components/seller/order-management"
+import { ProductList } from "@/components/seller/products/product-list"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { dummyOrders } from "@/components/seller/dummy-data"
+import { dummyProducts } from "@/components/seller/dummy-data"
 
-export default function OrdersPage() {
-  const handleStatusUpdate = async (orderId: string, status: string) => {
+export default function ProductsPage() {
+  const handleSyncChange = async (productId: string, isSync: boolean) => {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // In real implementation, this would call the API
-    console.log(`Order ${orderId} status changed to ${status}`)
-  }
-
-  const handleTrackingUpdate = async (orderId: string, trackingNumber: string, courier: string) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    // In real implementation, this would call the API
-    console.log(`Order ${orderId} tracking updated: ${courier} - ${trackingNumber}`)
+    console.log(`Product ${productId} sync changed to ${isSync}`)
   }
 
   return (
@@ -35,18 +27,14 @@ export default function OrdersPage() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Pesanan</BreadcrumbPage>
+                  <BreadcrumbPage>Produk</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <OrderManagement
-            orders={dummyOrders}
-            onStatusUpdate={handleStatusUpdate}
-            onTrackingUpdate={handleTrackingUpdate}
-          />
+          <ProductList products={dummyProducts} onSyncChange={handleSyncChange} />
         </div>
       </SidebarInset>
     </SidebarProvider>

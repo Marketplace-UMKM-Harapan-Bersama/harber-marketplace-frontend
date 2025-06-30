@@ -1,13 +1,21 @@
 "use client"
 
 import { AppSidebar } from "@/components/seller/app-sider"
-import { ShipmentList } from "@/components/seller/shipment-list"
+import { CategoryList } from "@/components/seller/categories/category-list"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { dummyShipments } from "@/components/seller/dummy-data"
+import { dummyCategories } from "@/components/seller/dummy-data"
 
-export default function ShippingPage() {
+export default function CategoriesPage() {
+  const handleSyncChange = async (categoryId: string, isSync: boolean) => {
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // In real implementation, this would call the API
+    console.log(`Category ${categoryId} sync changed to ${isSync}`)
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -19,14 +27,14 @@ export default function ShippingPage() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Daftar Pengiriman</BreadcrumbPage>
+                  <BreadcrumbPage>Kategori</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <ShipmentList shipments={dummyShipments} />
+          <CategoryList categories={dummyCategories} onSyncChange={handleSyncChange} />
         </div>
       </SidebarInset>
     </SidebarProvider>

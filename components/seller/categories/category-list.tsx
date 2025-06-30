@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { CategorySyncToggle } from "./category-sync-toggle"
-import type { Category } from "@/lib/dummy-data"
+import type { Category } from "@/components/seller/dummy-data"
 
 interface CategoryListProps {
   categories: Category[]
@@ -105,7 +105,7 @@ export function CategoryList({ categories, onSyncChange }: CategoryListProps) {
                       categoryName={category.name}
                       isSync={category.isSync}
                       onSyncChange={onSyncChange}
-                      lastSyncAt={category.lastSyncAt}
+                      // lastSyncAt={category.lastSyncAt}
                     />
                   </TableCell>
                   <TableCell>

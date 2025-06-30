@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 
 interface DashboardStats {
   totalProducts: number;
@@ -122,34 +121,6 @@ export function SellerDashboard({ stats }: SellerDashboardProps) {
           </CardContent>
         </Card>
       </div>
-
-      {/* Sync Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Status Sinkronisasi Produk</CardTitle>
-          <CardDescription>
-            Pantau status sinkronisasi produk Anda ke marketplace
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Produk Tersinkronisasi</span>
-            <span className="text-sm text-muted-foreground">
-              {stats.syncedProducts} dari {stats.totalProducts}
-            </span>
-          </div>
-          <Progress value={syncPercentage} className="w-full" />
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">
-              {stats.totalProducts - stats.syncedProducts} produk belum
-              disinkronkan
-            </span>
-            <Button variant="outline" size="sm">
-              Kelola Sinkronisasi
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Recent Orders */}
       <Card>

@@ -13,6 +13,7 @@ import {
   User,
   Settings,
   LogOut,
+  Store,
 } from "lucide-react";
 
 import {
@@ -40,47 +41,45 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const data = {
   user: {
     name: "Toko Berkah Jaya",
     email: "berkah@example.com",
-    avatar: "/avatars/seller.jpg",
   },
   navMain: [
     {
       title: "Overview",
-      url: "/seller",
+      url: "/dashboard",
       icon: BarChart3,
     },
     {
       title: "Produk",
-      url: "/seller/products",
+      url: "/dashboard/products",
       icon: Package,
     },
     {
       title: "Kategori",
-      url: "/seller/categories",
+      url: "/dashboard/categories",
       icon: FolderOpen,
     },
     {
       title: "Pesanan",
-      url: "/seller/orders",
+      url: "/dashboard/orders",
       icon: ShoppingCart,
     },
     {
       title: "Pengiriman",
-      url: "/seller/shipping",
+      url: "/dashboard/shipping",
       icon: Truck,
       items: [
         {
           title: "Daftar Pengiriman",
-          url: "/seller/shipping",
+          url: "/dashboard/shipping",
         },
         {
           title: "Isi Resi",
-          url: "/seller/shipping/tracking",
+          url: "/dashboard/shipping/tracking",
         },
       ],
     },
@@ -105,15 +104,11 @@ export function AppSidebar({ ...props }) {
               return (
                 <Collapsible key={item.title} asChild defaultOpen={isActive}>
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild tooltip={item.title}>
-                      <Link href={item.url}>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton tooltip={item.title} isActive={isActive}>
                         <item.icon />
                         <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton className="absolute right-1 top-1 size-6 p-0">
-                        <ChevronDown className="size-4" />
+                        <ChevronDown className="ml-auto size-4" />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
@@ -162,15 +157,9 @@ export function AppSidebar({ ...props }) {
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={data.user.avatar} alt={data.user.name} />
-                    <AvatarFallback className="rounded-lg">
-                      {data.user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                    <Store className="h-4 w-4" />
+                  </div>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
                       {data.user.name}

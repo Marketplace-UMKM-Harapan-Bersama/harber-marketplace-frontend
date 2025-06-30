@@ -1,7 +1,7 @@
 "use client"
 
 import { AppSidebar } from "@/components/seller/app-sider"
-import { TrackingInputPage } from "@/components/seller/tracking-input-page"
+import { TrackingInputPage } from "@/components/seller/shipping/tracking-input-page"
 import {
   Breadcrumb,
   BreadcrumbItem,
