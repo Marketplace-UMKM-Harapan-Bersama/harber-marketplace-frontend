@@ -1,41 +1,38 @@
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
+import { dummyProducts } from "@/components/product/dummy";
+import { ProductCategories } from "@/components/product/product-categories";
+import { ProductList } from "@/components/product/product-list";
+import { HeroSection } from "@/components/section/hero";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="">
+    <>
       <Header />
-    </div>
+      <main className="flex flex-col gap-4  py-10 px-10">
+        <section className="flex flex-col gap-4">
+          <HeroSection />
+        </section>
+        <section className="flex items-center justify-center gap-4">
+          <Button variant={"outline"} className="rounded-full" asChild>
+            <Link href={"/categories"}>Lihat Semua</Link>
+          </Button>
+          <ProductCategories />
+        </section>
+
+        <section className="flex flex-col">
+          <h2 className="text-2xl font-light">Produk Terbaru</h2>
+          <p className="text-sm text-muted-foreground font-light pb-4">
+            Temukan produk terbaru dari berbagai kategori
+          </p>
+          <div className="flex overflow-x-auto gap-4 no-scrollbar">
+            <ProductList products={dummyProducts} />
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </>
   );
 }
-
-const Header = () => {
-  return (
-    <header className="flex justify-between items-center p-4 border-b bg-background">
-      <Link href={"/"}>PHB Market</Link>
-      <nav className="flex items-center gap-2">
-        <div className="flex items-center gap-2">
-          <Link href={"/products"}>Products</Link>
-          <Link href={"/about"}>About</Link>
-        </div>
-
-        <div className="flex items-center gap-2 ml-4">
-          <Button className="rounded-full" variant={"outline"} asChild>
-            <Link href={"/sign-in"}>Masuk</Link>
-          </Button>
-          <Button className="rounded-full" asChild>
-            <Link href={"/sign-up"}>Daftar</Link>
-          </Button>
-          <Button
-            className="rounded-full relative"
-            variant={"outline"}
-            size={"icon"}
-          >
-            <ShoppingCart className="w-4 h-4" />
-          </Button>
-        </div>
-      </nav>
-    </header>
-  );
-};

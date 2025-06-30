@@ -15,3 +15,13 @@ export interface Product {
   created_at: string;
   updated_at: string;
 }
+
+export interface Category {
+  id: number;
+  seller_id: number;
+  name: string;
+  slug: string;
+  parent_id: number;
+  created_at: string;
+  updated_at: string;
+}

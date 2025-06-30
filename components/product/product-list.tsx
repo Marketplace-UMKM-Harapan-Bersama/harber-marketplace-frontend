@@ -21,10 +21,10 @@ export function ProductList({
     : products;
 
   return (
-    <div className={`grid gap-6 ${className}`}>
+    <div className={`flex gap-6 ${className}`}>
       {displayProducts.map((product) => (
         <Link key={product.id} href={`/products/${product.id}`}>
-          <Card className="group h-full p-0 overflow-hidden border-none shadow-none">
+          <Card className="group h-full p-0 overflow-hidden border-none shadow-none w-full">
             <div className="relative aspect-square overflow-hidden">
               <Image
                 src={product.image_url}

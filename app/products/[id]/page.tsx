@@ -5,7 +5,7 @@ import { use } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ProductDetail } from "@/components/product/product-detail";
-import { dummyProducts } from "@/components/product/dummy-product";
+import { dummyProducts } from "@/components/product/dummy";
 
 interface ProductDetailPageProps {
   params: Promise<{

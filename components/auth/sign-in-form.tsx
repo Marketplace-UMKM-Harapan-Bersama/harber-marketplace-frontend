@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { GalleryVerticalEnd } from "lucide-react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 
 import { authService } from "@/lib/api";
@@ -39,7 +39,8 @@ export function SignInForm({
     try {
       setIsLoading(true);
       await authService.signIn(data);
-      router.push("/dashboard");
+
+      router.push("/");
     } catch (error) {
       console.error(error);
     } finally {
@@ -53,23 +54,17 @@ export function SignInForm({
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col items-center gap-2">
-              <a
-                href="#"
-                className="flex flex-col items-center gap-2 font-medium"
-              >
-                <div className="flex size-8 items-center justify-center rounded-md">
-                  <GalleryVerticalEnd className="size-6" />
-                </div>
-                <span className="sr-only">Harber Marketplace</span>
-              </a>
+              <Link href="/" className="text-4xl font-bold">
+                H
+              </Link>
               <h1 className="text-xl font-bold">
-                Welcome to Harber Marketplace
+                Selamat Datang di Harber - Market
               </h1>
               <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
-                <a href="/sign-up" className="underline underline-offset-4">
-                  Sign up
-                </a>
+                Belum punya akun?{" "}
+                <Link href="/sign-up" className="underline underline-offset-4">
+                  Daftar
+                </Link>
               </div>
             </div>
             <div className="flex flex-col gap-6">
@@ -82,7 +77,7 @@ export function SignInForm({
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="m@example.com"
+                        placeholder="email@example.com"
                         disabled={isLoading}
                         {...field}
                       />
@@ -105,15 +100,16 @@ export function SignInForm({
                 )}
               />
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign in"}
+                {isLoading ? "Memuat..." : "Masuk"}
               </Button>
             </div>
           </div>
         </form>
       </Form>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        Dengan melanjutkan, Anda setuju dengan{" "}
+        <Link href="#">Syarat dan Ketentuan</Link> dan{" "}
+        <Link href="#">Kebijakan Privasi</Link>.
       </div>
     </div>
   );

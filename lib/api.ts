@@ -1,5 +1,6 @@
 import axios from "axios";
 import { SignInFormValues, SignUpFormValues } from "./schema";
+import { getToken, removeToken, setToken } from "./utils";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
@@ -20,20 +21,21 @@ export const authService = {
   async signIn(data: SignInFormValues) {
     const response = await api.post("/api/login", data);
     // Simpan access_token
-    localStorage.setItem("access_token", response.data.access_token);
+    setToken(response.data.access_token);
 
     return response.data;
   },
 
   async signOut() {
     const response = await api.post("/api/logout");
+    removeToken();
     return response.data;
   },
 };
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("access_token");
+    const token = getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

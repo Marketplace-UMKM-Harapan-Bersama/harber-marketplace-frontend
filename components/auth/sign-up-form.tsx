@@ -312,8 +312,9 @@ export function SignUpForm({
         </form>
       </Form>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        Dengan melanjutkan, Anda menyetujui <a href="#">Syarat dan Ketentuan</a>{" "}
-        dan <a href="#">Kebijakan Privasi</a> kami.
+        Dengan melanjutkan, Anda setuju dengan{" "}
+        <a href="#">Syarat dan Ketentuan</a> dan{" "}
+        <a href="#">Kebijakan Privasi</a> kami.
       </div>
     </div>
   );
