@@ -60,12 +60,6 @@ export function SignInForm({
               <h1 className="text-xl font-bold">
                 Selamat Datang di Harber - Market
               </h1>
-              <div className="text-center text-sm">
-                Belum punya akun?{" "}
-                <Link href="/sign-up" className="underline underline-offset-4">
-                  Daftar
-                </Link>
-              </div>
             </div>
             <div className="flex flex-col gap-6">
               <FormField
@@ -106,6 +100,12 @@ export function SignInForm({
           </div>
         </form>
       </Form>
+      <div className="text-center text-sm">
+        Belum punya akun?{" "}
+        <Link href="/sign-up" className="underline underline-offset-4">
+          Daftar
+        </Link>
+      </div>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
         Dengan melanjutkan, Anda setuju dengan{" "}
         <Link href="#">Syarat dan Ketentuan</Link> dan{" "}
