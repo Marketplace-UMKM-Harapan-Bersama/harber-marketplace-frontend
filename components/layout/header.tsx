@@ -8,7 +8,7 @@ import { UserButton } from "../auth/user-button";
 
 export const Header = () => {
   return (
-    <header className="flex items-center justify-between px-10 py-4 border-b bg-background">
+    <header className="sticky top-0 z-50 flex items-center justify-between px-10 py-4 border-b bg-background">
       <div className="flex items-center gap-8 w-full max-w-7xl mx-auto">
         <Link href={"/"} className="text-2xl font-black shrink-0">
           H
