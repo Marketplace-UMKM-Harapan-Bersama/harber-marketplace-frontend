@@ -12,7 +12,6 @@ import {
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
   headers: {
-    Accept: "application/json",
     "Content-Type": "application/json",
     CLIENT_ID: process.env.NEXT_PUBLIC_CLIENT_ID || "",
     CLIENT_SECRET: process.env.NEXT_PUBLIC_CLIENT_SECRET || "",
@@ -55,42 +54,34 @@ export const authService = {
   },
 };
 
-const apiProduct = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_PRODUCT_URL,
-  headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-  },
-});
-
 // Product and Category API functions
 export async function getProducts(): Promise<
   ApiResponse<SellerWithProducts[]>
 > {
-  const response = await apiProduct.get("/api/products");
+  const response = await api.get("/api/products");
   return response.data;
 }
 
 export async function getProduct(id: number): Promise<ApiResponse<Product>> {
-  const response = await apiProduct.get(`/api/products/${id}`);
+  const response = await api.get(`/api/products/${id}`);
   return response.data;
 }
 
 export async function getCategories(): Promise<
   ApiResponse<SellerWithCategories[]>
 > {
-  const response = await apiProduct.get("/api/categories");
+  const response = await api.get("/api/categories");
   return response.data;
 }
 
 export async function getCategory(id: number): Promise<ApiResponse<Category>> {
-  const response = await apiProduct.get(`/api/categories/${id}`);
+  const response = await api.get(`/api/categories/${id}`);
   return response.data;
 }
 
 export async function getSellerProducts(
   sellerId: number
 ): Promise<ApiResponse<SellerWithProducts>> {
-const response = await apiProduct.get(`/api/sellers/${sellerId}/products`);
+  const response = await api.get(`/api/sellers/${sellerId}/products`);
   return response.data;
 }
