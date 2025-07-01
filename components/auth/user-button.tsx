@@ -1,11 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { User } from "lucide-react";
+import { LogOut, Package, User } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { isAuthenticated, removeToken } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,60 +10,59 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
+import { useTheme } from "next-themes";
+import { useAuth } from "@/hooks/use-auth";
 
 export const UserButton = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    setIsLoggedIn(isAuthenticated());
-  }, []);
-
-  const handleLogout = () => {
-    removeToken();
-    setIsLoggedIn(false);
-    router.push("/");
-  };
+  const { isAuthed, logout } = useAuth();
+  // const { isAuthed, logout, user } = useAuth();
+  const { setTheme, theme } = useTheme();
 
   return (
     <div className="flex items-center gap-2">
-      {!isLoggedIn ? (
+      {!isAuthed ? (
         <>
-          <Button className="rounded-full" variant={"outline"} asChild>
+          <Button variant={"outline"} asChild>
             <Link href={"/sign-in"}>Masuk</Link>
           </Button>
-          <Button className="rounded-full" asChild>
+          <Button asChild>
             <Link href={"/sign-up"}>Daftar</Link>
           </Button>
         </>
       ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              className="rounded-full w-10 h-10 p-0 bg-gradient-to-br from-primary to-primary/50 hover:from-primary/80 hover:to-primary"
-              variant="ghost"
-            >
-              <User className="w-5 h-5 text-white" />
+            <Button className=" w-10 h-10 p-0 ">
+              <User className="w-5 h-5 text-primary-foreground" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Akun Saya</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="w-48 text-xs p-1">
+            <DropdownMenuLabel className="flex items-center gap-2 max-w-[180px] truncate">
+              <User className="w-4 h-4" />
+              <span className="truncate">wahyufadil1140@gmail.com</span>
+            </DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <Link href="/orders" className="flex items-center gap-2">
+                <Package />
+                Pesanan
+              </Link>
+            </DropdownMenuItem>
+
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href="/profile">Profil</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/orders">Pesanan</Link>
-            </DropdownMenuItem>
-            {/* <DropdownMenuItem asChild>
-              <Link href="/wishlist">Wishlist</Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator /> */}
-            <DropdownMenuItem
-              className="text-red-600 focus:text-red-600"
-              onClick={handleLogout}
-            >
+            <DropdownMenuLabel>Theme</DropdownMenuLabel>
+            <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+              <DropdownMenuRadioItem value="system">
+                System
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={logout}>
+              <LogOut className="w-4 h-4" />
               Keluar
             </DropdownMenuItem>
           </DropdownMenuContent>

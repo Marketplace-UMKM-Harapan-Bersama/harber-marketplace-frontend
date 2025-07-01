@@ -6,6 +6,7 @@ interface UseProductsOptions {
   sellerId?: number;
   excludeProduct?: number;
   searchQuery?: string;
+  categoryId?: number;
   sortBy?: "relevance" | "trending" | "latest" | "price_asc" | "price_desc";
   page?: number;
 }
@@ -14,16 +15,17 @@ export function useProducts({
   sellerId,
   excludeProduct,
   searchQuery,
+  categoryId,
   sortBy = "relevance",
   page = 1,
 }: UseProductsOptions = {}) {
   return useQuery({
     queryKey: [
       "products",
-      { sellerId, excludeProduct, searchQuery, sortBy, page },
+      { sellerId, excludeProduct, searchQuery, categoryId, sortBy, page },
     ],
     queryFn: async () => {
-      const response = await getProducts();
+      const response = await getProducts(categoryId);
       let products = response.data.flatMap((seller) =>
         seller.products.map((product) => ({
           ...product,

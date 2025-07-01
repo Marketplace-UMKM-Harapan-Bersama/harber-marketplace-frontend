@@ -12,10 +12,11 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { formatPrice, isAuthenticated } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/lib/store";
 import Image from "next/image";
 import Link from "next/link";
+import { isAuthenticated } from "@/lib/auth";
 
 export function CartSheet() {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -23,16 +24,12 @@ export function CartSheet() {
   const isLoggedIn = isAuthenticated();
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
       <SheetTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="relative bg-card rounded-full"
-        >
+        <Button variant="outline" size="icon" className="relative bg-card ">
           <ShoppingCart className="w-4 h-4" />
           {isLoggedIn && items.length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full w-4 h-4 flex items-center justify-center">
+            <span className="absolute -top-1 rounded-md -right-1 bg-primary text-primary-foreground text-xs  w-4 h-4 flex items-center justify-center">
               {items.length}
             </span>
           )}
@@ -47,17 +44,17 @@ export function CartSheet() {
           {!isLoggedIn ? (
             <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
               <ShoppingCart className="w-20 h-20" />
-              <p className="text-muted-foreground mb-4 text-2xl font-bold text-center">
-                Masuk untuk melihat keranjang belanja Anda
+              <p className="text-muted-foreground mb-4 text-center">
+                Keranjang kamu kosong
               </p>
-              <Button asChild variant="default" size="lg">
-                <Link href="/sign-in">Masuk</Link>
+              <Button variant="outline" onClick={() => setIsOpen(false)}>
+                Lanjutkan Belanja
               </Button>
             </div>
           ) : items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
               <ShoppingCart className="w-20 h-20" />
-              <p className="text-muted-foreground mb-4 text-2xl font-bold">
+              <p className="text-muted-foreground mb-4">
                 Keranjang kamu kosong
               </p>
               <Button variant="outline" onClick={() => setIsOpen(false)}>
@@ -80,7 +77,7 @@ export function CartSheet() {
                     />
 
                     <button
-                      className="absolute z-10 -top-2 -left-2 text-muted-foreground hover:text-foreground rounded-full p-1.5 border bg-muted shadow"
+                      className="absolute z-10 -top-2 -left-2 text-muted-foreground hover:text-foreground  p-1.5 border bg-muted shadow rounded-md"
                       onClick={() => removeItem(item.id)}
                     >
                       <X className="h-4 w-4" />
@@ -100,11 +97,11 @@ export function CartSheet() {
                       <p className="font-medium">{formatPrice(item.price)}</p>
                     </div>
                     <div className="absolute bottom-5 -right-1 items-center gap-2">
-                      <div className="flex items-center rounded-full border">
+                      <div className="flex items-center  rounded-md border">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-l-full"
+                          className="h-8 w-8 rounded-l-md"
                           onClick={() =>
                             updateQuantity(item.id, item.quantity - 1)
                           }
@@ -112,11 +109,13 @@ export function CartSheet() {
                         >
                           -
                         </Button>
-                        <span className="w-8 text-center">{item.quantity}</span>
+                        <span className="w-8 text-center ">
+                          {item.quantity}
+                        </span>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-r-full"
+                          className="h-8 w-8 rounded-r-md"
                           onClick={() =>
                             updateQuantity(item.id, item.quantity + 1)
                           }

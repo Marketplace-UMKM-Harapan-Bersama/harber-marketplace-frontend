@@ -1,7 +1,14 @@
+import { ModeToggle } from "@/components/layout/mode-toggle";
+
 export const Footer = () => {
   return (
-    <footer className="flex flex-col justify-center items-center p-4 bg-background font-mono">
-      <p>&copy; 2025 Harber - Market</p>
+    <footer className="flex border-t border-border/40  mx-5 flex-col justify-center items-center p-4 bg-background pb-20">
+      <div className="flex justify-between items-center w-full">
+        <p className="text-xs text-muted-foreground">
+          &copy; 2025 Marketplace UMKM Harapan Bersama
+        </p>
+        <ModeToggle />
+      </div>
     </footer>
   );
 };

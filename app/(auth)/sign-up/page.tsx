@@ -2,9 +2,10 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { redirectIfAuthenticated } from "@/lib/utils";
+import { redirectIfAuthenticated } from "@/lib/auth";
 import { SignUpForm } from "@/components/auth/sign-up-form";
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
 export default function SignUpPage() {
   useEffect(() => {
@@ -13,17 +14,20 @@ export default function SignUpPage() {
 
   return (
     <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-      <div className="flex flex-col items-center gap-2">
-        <Link href="/" className="text-4xl font-bold">
-          H
-        </Link>
-        <h1 className="text-xl font-bold">Buat Akun Baru</h1>
-        <div className="text-center text-sm">
-          Sudah punya akun?{" "}
-          <Link href="/sign-in" className="underline underline-offset-4">
-            Masuk
+      <div className="flex flex-col items-center ">
+        <Button variant={"outline"} size={"icon"} asChild>
+          <Link
+            href={"/"}
+            className=" flex items-center gap-2 font-black text-primary mb-5 "
+          >
+            H
           </Link>
-        </div>
+        </Button>
+        <h1 className="text-xl font-medium">Buat Akun Baru</h1>
+        <p className="text-sm text-muted-foreground max-w-xs text-center">
+          Daftar sebagai Customer atau Seller untuk mulai menggunakan layanan
+          kami.
+        </p>
       </div>
       <div className="w-full max-w-sm">
         <Tabs defaultValue="customer">

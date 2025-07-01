@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { useCategories } from "@/hooks/use-queries";
+import { slugify } from "@/lib/utils";
+import { Skeleton } from "../ui/skeleton";
 
 export const ProductCategories = () => {
-  const { data: categories, error, isLoading } = useCategories();
+  const { data: categoriesData, error, isLoading } = useCategories();
 
   if (error) {
     return (
@@ -15,22 +17,32 @@ export const ProductCategories = () => {
     );
   }
 
-  const displayCategories = categories;
+  // Get unique categories by ID
+  const uniqueCategories = categoriesData
+    ? Array.from(new Set(categoriesData.map((cat) => cat.id))).map((id) =>
+        categoriesData.find((cat) => cat.id === id)
+      )
+    : [];
 
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-2">
-      {isLoading && <div>Loading...</div>}
+    <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+      <Link href="/search">
+        <Button variant="default" className=" whitespace-nowrap">
+          <span className="text-sm">All Products</span>
+        </Button>
+      </Link>
+      {isLoading &&
+        Array.from({ length: 7 }).map((_, idx) => (
+          <Skeleton key={idx} className="w-24 h-9 " />
+        ))}
       {!isLoading &&
-        displayCategories?.map((category) => (
+        uniqueCategories?.map((category) => (
           <Link
-            href={`/search/${category.slug || category.id}`}
-            key={category.id}
+            href={`/search/${slugify(category?.name || "")}`}
+            key={category?.id}
           >
-            <Button
-              variant="outline"
-              className={`rounded-full whitespace-nowrap`}
-            >
-              <span className="text-sm">{category.name}</span>
+            <Button variant="outline" className=" whitespace-nowrap">
+              <span className="text-sm">{category?.name}</span>
             </Button>
           </Link>
         ))}

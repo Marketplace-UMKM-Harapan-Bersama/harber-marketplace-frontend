@@ -19,12 +19,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
+import { Loader } from "lucide-react";
 
 export function SignInForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const form = useForm<SignInFormValues>({
@@ -36,13 +40,18 @@ export function SignInForm({
   });
 
   async function onSubmit(data: SignInFormValues) {
+    setError(null);
     try {
       setIsLoading(true);
       await authService.signIn(data);
-
       router.push("/");
+      toast.success("selamat datang 👋🏼");
     } catch (error) {
-      console.error(error);
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("Terjadi kesalahan saat login. Silakan coba lagi.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -53,14 +62,11 @@ export function SignInForm({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="flex flex-col gap-6">
-            <div className="flex flex-col items-center gap-2">
-              <Link href="/" className="text-4xl font-bold">
-                H
-              </Link>
-              <h1 className="text-xl font-bold">
-                Selamat Datang di Harber - Market
-              </h1>
-            </div>
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             <div className="flex flex-col gap-6">
               <FormField
                 control={form.control}
@@ -94,7 +100,11 @@ export function SignInForm({
                 )}
               />
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Memuat..." : "Masuk"}
+                {isLoading ? (
+                  <Loader className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Masuk"
+                )}
               </Button>
             </div>
           </div>

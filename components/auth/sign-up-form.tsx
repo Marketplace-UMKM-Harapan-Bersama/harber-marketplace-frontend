@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { authService } from "@/lib/api";
 import { signUpSchema, type Role } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader } from "lucide-react";
+import Link from "next/link";
 
 interface SignUpFormProps extends React.ComponentProps<"div"> {
   role?: Role;
@@ -47,6 +49,7 @@ export function SignUpForm({
   ...props
 }: SignUpFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const form = useForm<FormData>({
@@ -72,10 +75,10 @@ export function SignUpForm({
   });
 
   const onSubmit = async (data: FormData) => {
-    try {
-      setIsLoading(true);
+    setError(null);
+    setIsLoading(true);
 
-      // Prepare the submission data
+    try {
       const submissionData = {
         ...data,
         role,
@@ -88,20 +91,23 @@ export function SignUpForm({
         delete submissionData.shop_description;
       }
 
-      // Submit the form
-      await authService.signUp(submissionData);
-
       toast.success(
         role === "seller"
           ? "Pendaftaran berhasil! Silakan tunggu verifikasi dari admin."
           : "Pendaftaran berhasil! Silakan masuk."
       );
+
       router.push("/sign-in");
     } catch (error) {
-      console.error(error);
-      toast.error(
-        "Gagal mendaftar. Silakan periksa kembali data Anda dan coba lagi."
-      );
+      if (error instanceof Error) {
+        setError(error.message);
+        toast.error(error.message);
+      } else {
+        const errorMessage =
+          "Gagal mendaftar. Silakan periksa kembali data Anda dan coba lagi.";
+        setError(errorMessage);
+        toast.error(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -112,6 +118,11 @@ export function SignUpForm({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="flex flex-col gap-6">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             <div className="flex flex-col gap-6">
               <FormField
                 control={form.control}
@@ -305,12 +316,22 @@ export function SignUpForm({
                 </>
               )}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Membuat akun..." : "Buat Akun"}
+                {isLoading ? (
+                  <Loader className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Buat Akun"
+                )}
               </Button>
             </div>
           </div>
         </form>
       </Form>
+      <div className="text-center text-sm">
+        Sudah punya akun?{" "}
+        <Link href="/sign-in" className="underline underline-offset-4">
+          Masuk
+        </Link>
+      </div>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
         Dengan melanjutkan, Anda setuju dengan{" "}
         <a href="#">Syarat dan Ketentuan</a> dan{" "}

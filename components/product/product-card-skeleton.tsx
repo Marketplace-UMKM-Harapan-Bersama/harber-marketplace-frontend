@@ -21,12 +21,8 @@ export function ProductCardSkeleton({
       <div className="rounded-lg h-full overflow-hidden">
         <Skeleton className="aspect-square rounded-lg" />
         <div className="flex flex-col gap-2 pt-3">
-          <Skeleton className="h-5 w-3/4" />
-          <Skeleton className="h-10 w-full" />
-          <div className="flex items-center justify-between mt-2">
-            <Skeleton className="h-6 w-24" />
-            <Skeleton className="h-4 w-16" />
-          </div>
+          <Skeleton className="h-5 w-full " />
+          <Skeleton className="h-7 w-full" />
         </div>
       </div>
     </div>

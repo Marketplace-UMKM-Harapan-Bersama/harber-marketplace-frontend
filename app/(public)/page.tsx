@@ -1,20 +1,15 @@
 import { ProductCategories } from "@/components/product/product-categories";
 import { ProductList } from "@/components/product/product-list";
 import { HeroSection } from "@/components/section/hero";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export default function Home() {
   return (
     <>
-      <div className="flex flex-col gap-4 py-10 px-10">
+      <div className="flex flex-col gap-4 py-10 container mx-auto">
         <section className="flex flex-col gap-4">
           <HeroSection />
         </section>
         <section className="flex items-center justify-center gap-4">
-          <Button variant={"outline"} className="rounded-full" asChild>
-            <Link href={"/categories"}>Lihat Semua</Link>
-          </Button>
           <ProductCategories />
         </section>
 
@@ -26,9 +21,6 @@ export default function Home() {
                 Temukan produk terbaru dari berbagai kategori
               </p>
             </div>
-            <Button variant="link" className="text-primary" asChild>
-              <Link href="/search">Lihat Semua</Link>
-            </Button>
           </div>
           <ProductList gridCols="scroll" isPaginated={false} sortBy="latest" />
         </section>

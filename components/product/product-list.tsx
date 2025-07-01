@@ -13,6 +13,7 @@ interface ProductListProps {
   className?: string;
   sellerId?: number;
   searchQuery?: string;
+  categoryId?: number;
   sortBy?: "relevance" | "trending" | "latest" | "price_asc" | "price_desc";
   page?: number;
   onPageChange?: (totalPages: number) => void;
@@ -26,6 +27,7 @@ export function ProductList({
   className = "",
   sellerId,
   searchQuery,
+  categoryId,
   sortBy = "relevance",
   page = 1,
   onPageChange,
@@ -41,6 +43,7 @@ export function ProductList({
     sellerId,
     excludeProduct,
     searchQuery,
+    categoryId,
     sortBy,
     page,
   });
@@ -58,7 +61,8 @@ export function ProductList({
       "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6",
     "grid-6":
       "grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6",
-    scroll: "flex gap-4 snap-x snap-mandatory overflow-x-auto pb-4",
+    scroll:
+      "flex gap-4 snap-x snap-mandatory overflow-x-auto pb-4 no-scrollbar",
   };
 
   if (isLoading) {
@@ -107,7 +111,7 @@ export function ProductList({
           )}
         >
           <div className="rounded-lg group h-full overflow-hidden border-none shadow-none transition-shadow duration-300">
-            <div className="rounded-lg relative aspect-square overflow-hidden bg-muted">
+            <div className="rounded-lg relative aspect-square overflow-hidden bg-muted border group-hover:border-primary">
               <Image
                 src={product.image_url}
                 alt={product.name}
@@ -123,14 +127,14 @@ export function ProductList({
                 </p>
               )}
               <div className="flex items-center justify-between mt-auto">
-                <span className="text-lg font-bold">
+                <span className="text-md font-medium">
                   {formatPrice(product.price)}
                 </span>
-                {product.stock !== undefined && (
+                {/* {product.stock !== undefined && (
                   <span className="text-sm text-muted-foreground">
                     Stok: {product.stock}
                   </span>
-                )}
+                )} */}
               </div>
             </div>
           </div>

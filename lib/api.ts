@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { SignInFormValues, SignUpFormValues } from "./schema";
-import { getToken, removeToken, setToken } from "./utils";
+import { getToken, removeToken, setToken } from "./auth";
 import {
   type ApiResponse,
   type Product,
@@ -12,6 +12,7 @@ import {
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
   headers: {
+    Accept: "application/json",
     "Content-Type": "application/json",
     CLIENT_ID: process.env.NEXT_PUBLIC_CLIENT_ID || "",
     CLIENT_SECRET: process.env.NEXT_PUBLIC_CLIENT_SECRET || "",
@@ -32,14 +33,41 @@ api.interceptors.request.use(
 
 export const authService = {
   async signUp(data: SignUpFormValues) {
-    const response = await api.post("/api/register", data);
-    return response.data;
+    try {
+      const response = await api.post("/api/register", data);
+      const { data: responseData } = response;
+
+      // If we get a response with status 200, it's a success regardless of the response body structure
+      if (response.status === 200) {
+        return responseData;
+      }
+
+      // If we get here with a non-200 status, throw an error
+      throw new Error(
+        responseData.message || "Gagal mendaftar. Silakan coba lagi."
+      );
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        throw new Error(error.response?.data?.message);
+      }
+      throw error;
+    }
   },
 
   async signIn(data: SignInFormValues) {
     const response = await api.post("/api/login", data);
-    setToken(response.data.access_token);
-    return response.data;
+    const { data: responseData } = response;
+
+    if (!responseData.success && responseData.message) {
+      throw new Error(responseData.message);
+    }
+
+    if (responseData.access_token) {
+      setToken(responseData.access_token);
+      return responseData;
+    }
+
+    throw new Error("Invalid response from server");
   },
 
   async signOut() {
@@ -55,10 +83,13 @@ export const authService = {
 };
 
 // Product and Category API functions
-export async function getProducts(): Promise<
-  ApiResponse<SellerWithProducts[]>
-> {
-  const response = await api.get("/api/products");
+export async function getProducts(
+  categoryId?: number
+): Promise<ApiResponse<SellerWithProducts[]>> {
+  const url = categoryId
+    ? `/api/products?category_id=${categoryId}`
+    : "/api/products";
+  const response = await api.get(url);
   return response.data;
 }
 

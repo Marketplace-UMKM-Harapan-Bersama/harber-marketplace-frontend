@@ -1,6 +1,3 @@
-"use client";
-
-import { use } from "react";
 import { ProductDetail } from "@/components/product/product-detail";
 
 interface ProductDetailPageProps {
@@ -9,7 +6,9 @@ interface ProductDetailPageProps {
   }>;
 }
 
-export default function ProductDetailPage({ params }: ProductDetailPageProps) {
-  const { slug } = use(params);
+export default async function ProductDetailPage({
+  params,
+}: ProductDetailPageProps) {
+  const { slug } = await params;
   return <ProductDetail slug={slug} />;
 }
