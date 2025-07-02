@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { signUpSchema, type Role } from "@/lib/schema";
 import { cn } from "@/lib/utils";
+import { authService } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -91,12 +92,17 @@ export function SignUpForm({
         delete submissionData.shop_description;
       }
 
+      // Call the registration API
+      await authService.signUp(submissionData);
+
+      // Show success message and redirect
       toast.success(
         role === "seller"
-          ? "Pendaftaran berhasil! Silakan tunggu verifikasi dari admin."
-          : "Pendaftaran berhasil! Silakan masuk."
+          ? "Pendaftaran berhasil! Silakan Masuk, selamat berjualan."
+          : "Pendaftaran berhasil! Silakan Masuk, selamat berbelanja."
       );
 
+      // Short delay before redirect to ensure toast is visible
       router.push("/sign-in");
     } catch (error) {
       if (error instanceof Error) {
@@ -166,7 +172,12 @@ export function SignUpForm({
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" disabled={isLoading} {...field} />
+                      <Input
+                        type="password"
+                        placeholder="********"
+                        disabled={isLoading}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

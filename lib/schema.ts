@@ -13,11 +13,36 @@ const baseUserSchema = {
   password: z.string().min(8, {
     message: "Password must be at least 8 characters.",
   }),
-  phone_number: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  province: z.string().optional(),
-  postal_code: z.string().optional(),
+  phone_number: z
+    .string()
+    .min(10, {
+      message: "Nomor telepon harus diisi minimal 10 digit.",
+    })
+    .optional(),
+  address: z
+    .string()
+    .min(1, {
+      message: "Alamat harus diisi.",
+    })
+    .optional(),
+  city: z
+    .string()
+    .min(1, {
+      message: "Kota harus diisi.",
+    })
+    .optional(),
+  province: z
+    .string()
+    .min(1, {
+      message: "Provinsi harus diisi.",
+    })
+    .optional(),
+  postal_code: z
+    .string()
+    .min(6, {
+      message: "Kode pos harus diisi minimal 6 digit.",
+    })
+    .optional(),
   role: roleEnum,
 };
 
@@ -34,7 +59,12 @@ const sellerSchema = {
       message: "Please enter a valid URL.",
     })
     .optional(),
-  shop_description: z.string().optional(),
+  shop_description: z
+    .string()
+    .min(10, {
+      message: "Deskripsi toko harus diisi minimal 10 karakter.",
+    })
+    .optional(),
 };
 
 export const signUpSchema = z

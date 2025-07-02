@@ -7,7 +7,7 @@ export const HeroSection = () => {
   const { isAuthed } = useAuth();
 
   return (
-    <div className=" min-h-80 flex items-start text-left md:text-center md:items-center justify-center flex-col gap-6 mb-10">
+    <div className="min-h-80 flex items-start text-left md:text-center md:items-center justify-center flex-col gap-6 mb-10">
       <h1 className="text-5xl font-medium">
         Marketplace UMKM <br />
         <span className="text-primary">Harapan Bersama</span>
@@ -21,9 +21,7 @@ export const HeroSection = () => {
 
       <div className="flex gap-2 justify-start">
         <Button variant={"default"} asChild>
-          <Link href={isAuthed ? "/dashboard" : "/sign-in"}>
-            Mulai Jualan
-          </Link>
+          <Link href={isAuthed ? "/dashboard" : "/sign-in"}>Mulai Jualan</Link>
         </Button>
 
         <Button variant={"outline"} asChild>

@@ -37,48 +37,77 @@ export const authService = {
       const response = await api.post("/api/register", data);
       const { data: responseData } = response;
 
-      // If we get a response with status 200, it's a success regardless of the response body structure
+      // For 200 status, consider it a success even if success flag isn't present
       if (response.status === 200) {
-        return responseData;
+        return {
+          success: true,
+          message: responseData.message || "Pendaftaran berhasil!",
+          data: responseData.data,
+        };
       }
 
-      // If we get here with a non-200 status, throw an error
+      // If we get here without a 200 status, throw an error
       throw new Error(
         responseData.message || "Gagal mendaftar. Silakan coba lagi."
       );
     } catch (error) {
+      // Handle Axios errors (network, 4xx, 5xx)
       if (error instanceof AxiosError) {
-        throw new Error(error.response?.data?.message);
+        const message = error.response?.data?.message || error.message;
+        throw new Error(message);
       }
+      // Re-throw other errors
       throw error;
     }
   },
 
   async signIn(data: SignInFormValues) {
-    const response = await api.post("/api/login", data);
-    const { data: responseData } = response;
+    try {
+      const response = await api.post("/api/login", data);
+      const { data: responseData } = response;
 
-    if (!responseData.success && responseData.message) {
-      throw new Error(responseData.message);
+      if (!responseData.success && responseData.message) {
+        throw new Error(responseData.message);
+      }
+
+      if (responseData.access_token) {
+        setToken(responseData.access_token);
+        return responseData;
+      }
+
+      throw new Error("Invalid response from server");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const message = error.response?.data?.message || error.message;
+        throw new Error(message);
+      }
+      throw error;
     }
-
-    if (responseData.access_token) {
-      setToken(responseData.access_token);
-      return responseData;
-    }
-
-    throw new Error("Invalid response from server");
   },
 
   async signOut() {
-    const response = await api.post("/api/logout");
-    removeToken();
-    return response.data;
+    try {
+      const response = await api.post("/api/logout");
+      removeToken();
+      return response.data;
+    } catch (error) {
+      // Still remove token even if API call fails
+      removeToken();
+      throw error;
+    }
   },
 
   async getUserData() {
-    const response = await api.get("/api/user");
-    return response.data;
+    try {
+      const response = await api.get("/api/user");
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 401) {
+        // If unauthorized, clear token
+        removeToken();
+      }
+      throw error;
+    }
   },
 };
 

@@ -93,7 +93,12 @@ export function SignInForm({
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" disabled={isLoading} {...field} />
+                      <Input
+                        type="password"
+                        disabled={isLoading}
+                        placeholder="********"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
