@@ -38,10 +38,9 @@ export const Header = () => {
               <Link href="/" className="flex items-center gap-2">
                 <Button
                   variant="noShadow"
-                  className="flex items-center font-black text-primary-foreground  text-lg  "
+                  className="flex items-center  text-primary-foreground "
                 >
-                  <span className="block md:hidden">H</span>
-                  <span className="hidden md:block">UMKM HARBER</span>
+                  H
                 </Button>
 
                 <p className="hidden md:block text-primary font-bold "></p>

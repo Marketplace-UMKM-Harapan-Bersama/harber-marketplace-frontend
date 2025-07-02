@@ -38,10 +38,10 @@ export function useAuth() {
     } catch (error) {
       console.error("Failed to logout:", error);
     } finally {
-      removeToken();
-      setIsAuthed(false);
-      setUser(null);
-      router.push("/");
+    removeToken();
+    setIsAuthed(false);
+    setUser(null);
+    router.push("/");
     }
   };
 

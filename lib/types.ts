@@ -57,3 +57,28 @@ export interface SellerWithProducts {
   shop_name: string;
   products: Product[];
 }
+
+// Order types
+export interface OrderItem {
+  product_id: number;
+  price: number;
+  quantity: number;
+}
+
+export interface Order {
+  user_id: number;
+  seller_id: number;
+  total_amount: number;
+  shipping_cost: number;
+  payment_method: string;
+  shipping_address: string;
+  shipping_city: string;
+  shipping_province: string;
+  shipping_postal_code: string;
+  items: OrderItem[];
+}
+
+export interface OrderResponse {
+  message: string;
+  orders: Order[];
+}

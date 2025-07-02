@@ -29,7 +29,7 @@ export const ProductCategories = () => {
     <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
       <Link href="/search">
         <Button
-          variant="reverse"
+          variant="default"
           className="  whitespace-nowrap flex items-center gap-2"
         >
           <span className="text-sm">Semua Produk</span>

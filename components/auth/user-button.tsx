@@ -47,7 +47,7 @@ export const UserButton = () => {
             <DropdownMenuItem asChild>
               <Link href="/orders" className="flex items-center gap-2">
                 <Package />
-                Pesanan
+                Pesanan Saya
               </Link>
             </DropdownMenuItem>
 
