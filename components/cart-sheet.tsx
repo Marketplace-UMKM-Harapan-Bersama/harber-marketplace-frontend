@@ -26,10 +26,10 @@ export function CartSheet() {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="relative bg-card ">
+        <Button variant="noShadow" size="icon" className="relative  ">
           <ShoppingCart className="w-4 h-4" />
           {isLoggedIn && items.length > 0 && (
-            <span className="absolute -top-1 rounded-md -right-1 bg-primary text-primary-foreground text-xs  w-4 h-4 flex items-center justify-center">
+            <span className="border border-primary-foreground absolute -top-1 rounded-md -right-1 bg-primary text-primary-foreground text-xs  w-4 h-4 flex items-center justify-center">
               {items.length}
             </span>
           )}

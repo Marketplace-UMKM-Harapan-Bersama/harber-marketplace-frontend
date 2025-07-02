@@ -37,15 +37,14 @@ export const Header = () => {
             <div className="flex items-center gap-2">
               <Link href="/" className="flex items-center gap-2">
                 <Button
-                  size="icon"
+                  variant="noShadow"
                   className="flex items-center font-black text-primary-foreground  text-lg  "
                 >
-                  H
+                  <span className="block md:hidden">H</span>
+                  <span className="hidden md:block">UMKM HARBER</span>
                 </Button>
 
-                <p className="hidden md:block text-primary font-bold ">
-                  UMKM HARBER
-                </p>
+                <p className="hidden md:block text-primary font-bold "></p>
               </Link>
             </div>
 

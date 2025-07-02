@@ -14,7 +14,7 @@ export default function SignInPage() {
     <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center ">
-          <Button variant={"outline"} size={"icon"} asChild>
+          <Button variant={"reverse"} size={"icon"} asChild>
             <Link
               href={"/"}
               className=" flex items-center gap-2 font-black text-primary mb-5 "

@@ -25,7 +25,7 @@ export const UserButton = () => {
     <div className="flex items-center gap-2">
       {!isAuthed ? (
         <>
-          <Button variant={"outline"} asChild>
+          <Button variant={"default"} asChild>
             <Link href={"/sign-in"}>Masuk</Link>
           </Button>
           <Button asChild>
@@ -35,7 +35,7 @@ export const UserButton = () => {
       ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button className=" w-10 h-10 p-0 ">
+            <Button variant={"noShadow"} className=" w-10 h-10 p-0 ">
               <User className="w-5 h-5 text-primary-foreground" />
             </Button>
           </DropdownMenuTrigger>

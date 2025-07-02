@@ -67,7 +67,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   return (
     <>
       <div className="flex  flex-col items-center justify-between px-5 py-10 bg-muted rounded-md border container mx-auto">
-        <div className="flex md:flex-row flex-col w-full  gap-x-8 items-center justify-center ">
+        <div className="flex md:flex-row flex-col w-full  gap-x-8  ">
           {/* Product Image */}
           <div className="w-full md:w-1/2">
             <div className="aspect-square overflow-hidden relative">
@@ -90,7 +90,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           {/* Product Info */}
           <div className="w-full md:w-1/2 flex flex-col">
             <div className="flex items-start justify-between">
-              <h1 className="text-4xl md:text-5xl font-medium">
+              <h1 className="text-4xl md:text-5xl font-medium ">
                 <span className="block">{product.name}</span>
               </h1>
             </div>

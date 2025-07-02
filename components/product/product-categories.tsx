@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import { useCategories } from "@/hooks/use-queries";
 import { slugify } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
+import { SearchIcon } from "lucide-react";
 
 export const ProductCategories = () => {
   const { data: categoriesData, error, isLoading } = useCategories();
@@ -27,8 +28,12 @@ export const ProductCategories = () => {
   return (
     <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
       <Link href="/search">
-        <Button variant="default" className=" whitespace-nowrap">
-          <span className="text-sm">All Products</span>
+        <Button
+          variant="reverse"
+          className="  whitespace-nowrap flex items-center gap-2"
+        >
+          <span className="text-sm">Semua Produk</span>
+          <SearchIcon className="w-4 h-4" />
         </Button>
       </Link>
       {isLoading &&
