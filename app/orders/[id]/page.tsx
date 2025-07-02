@@ -33,7 +33,8 @@ const DUMMY_ORDERS = [
         name: "T-Shirt Hitam",
         price: 75000,
         quantity: 1,
-        image_url: "https://picsum.photos/200",
+        image_url:
+          "https://res.cloudinary.com/dyacollection/image/upload/v1750585927/t-shirt-spiral-1_kz6pte.png",
       },
     ],
   },
@@ -60,7 +61,8 @@ const DUMMY_ORDERS = [
         name: "Kemeja Putih",
         price: 150000,
         quantity: 2,
-        image_url: "https://picsum.photos/201",
+        image_url:
+          "https://res.cloudinary.com/dyacollection/image/upload/v1750585927/t-shirt-spiral-1_kz6pte.png",
       },
     ],
   },

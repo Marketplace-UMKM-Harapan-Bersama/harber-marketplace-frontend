@@ -26,13 +26,15 @@ interface CartStore {
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
   getTotal: () => number;
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
 }
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
-
+      isLoading: false,
       addItem: (item) => {
         const existingItem = get().items.find((i) => i.id === item.id);
 
@@ -72,6 +74,10 @@ export const useCartStore = create<CartStore>()(
           (total, item) => total + item.price * item.quantity,
           0
         );
+      },
+
+      setIsLoading: (isLoading: boolean) => {
+        set({ isLoading });
       },
     }),
     {

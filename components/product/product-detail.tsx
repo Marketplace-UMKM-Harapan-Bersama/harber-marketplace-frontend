@@ -12,7 +12,7 @@ import { Skeleton } from "../ui/skeleton";
 import { useCartStore } from "@/lib/store";
 import { toast } from "sonner";
 import { useProduct } from "@/hooks/use-queries";
-import { isAuthenticated } from "@/lib/auth";
+import { useAuth } from "@/hooks/use-auth";
 
 interface ProductDetailProps {
   slug: string;
@@ -21,7 +21,7 @@ interface ProductDetailProps {
 export function ProductDetail({ slug }: ProductDetailProps) {
   const { data: product, isLoading, error } = useProduct(slug);
   const addToCart = useCartStore((state) => state.addItem);
-
+  const { isAuthed } = useAuth();
   const handleAddToCart = () => {
     if (!product || product.stock === undefined) return;
 
@@ -141,7 +141,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             </div>
 
             {/* Add to Cart Button */}
-            {isAuthenticated() ? (
+            {isAuthed ? (
               <>
                 {product.stock !== undefined && product.stock > 0 && (
                   <Button

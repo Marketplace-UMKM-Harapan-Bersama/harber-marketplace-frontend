@@ -16,19 +16,19 @@ import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/lib/store";
 import Image from "next/image";
 import Link from "next/link";
-import { isAuthenticated } from "@/lib/auth";
+import { useAuth } from "@/hooks/use-auth";
 
 export function CartSheet() {
   const [isOpen, setIsOpen] = React.useState(false);
   const { items, updateQuantity, removeItem, getTotal } = useCartStore();
-  const isLoggedIn = isAuthenticated();
+  const { isAuthed } = useAuth();
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
       <SheetTrigger asChild>
         <Button variant="noShadow" size="icon" className="relative  ">
           <ShoppingCart className="w-4 h-4" fill="currentColor" />
-          {isLoggedIn && items.length > 0 && (
+          {isAuthed && items.length > 0 && (
             <span className="border border-primary-foreground absolute -top-1 rounded-md -right-1 bg-primary text-primary-foreground text-xs  w-4 h-4 flex items-center justify-center">
               {items.length}
             </span>
@@ -41,7 +41,7 @@ export function CartSheet() {
         </SheetHeader>
 
         <ScrollArea className="flex-1 h-[50vh]">
-          {!isLoggedIn ? (
+          {!isAuthed ? (
             <div className="flex flex-col items-center justify-center h-[50vh] gap-4">
               <ShoppingCart className="w-20 h-20" />
               <p className="text-muted-foreground mb-4 text-center">
@@ -132,7 +132,7 @@ export function CartSheet() {
           )}
         </ScrollArea>
         <SheetFooter>
-          {isLoggedIn && items.length > 0 && (
+          {isAuthed && items.length > 0 && (
             <div className="border-t pt-6 space-y-6 w-full">
               <div className="space-y-2">
                 <div className="flex justify-between font-medium">

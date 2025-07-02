@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+
 import { Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,12 +31,10 @@ const initialFormData = {
 const SHIPPING_COST = 15000; // Rp 15.000 per seller
 
 export default function CheckoutPage() {
-  const router = useRouter();
   const { items, getTotal, clearCart } = useCartStore();
   const [paymentMethod, setPaymentMethod] = React.useState("bank_transfer");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [formData, setFormData] = React.useState(initialFormData);
-
   // Group items by seller
   const itemsBySeller = React.useMemo(() => {
     return items.reduce((acc, item) => {
@@ -99,7 +97,7 @@ export default function CheckoutPage() {
       toast.success("Order berhasil dibuat!");
 
       // Redirect to success page
-      router.push("/checkout/success");
+      // router.push("/checkout/success");
     } catch (error) {
       console.error("Checkout error:", error);
       toast.error(

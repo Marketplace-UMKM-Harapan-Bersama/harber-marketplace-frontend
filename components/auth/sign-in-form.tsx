@@ -22,6 +22,8 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
+import { setToken } from "@/lib/auth-client";
+import { useAuth } from "@/hooks/use-auth";
 
 export function SignInForm({
   className,
@@ -30,7 +32,7 @@ export function SignInForm({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
+  const { checkAuth } = useAuth();
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -43,9 +45,15 @@ export function SignInForm({
     setError(null);
     try {
       setIsLoading(true);
-      await authService.signIn(data);
-      router.push("/");
-      toast.success("selamat datang 👋🏼");
+      const response = await authService.signIn(data);
+      if (response.access_token) {
+        setToken(response.access_token);
+        await checkAuth();
+        toast.success("selamat datang 👋🏼");
+        router.push("/");
+      } else {
+        throw new Error("Token tidak ditemukan dalam respons");
+      }
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);

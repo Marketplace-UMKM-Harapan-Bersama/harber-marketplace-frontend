@@ -82,3 +82,18 @@ export interface OrderResponse {
   message: string;
   orders: Order[];
 }
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  province: string;
+  postal_code: string;
+  role: string;
+  email_verified_at: string;
+  created_at: string;
+  updated_at: string;
+}

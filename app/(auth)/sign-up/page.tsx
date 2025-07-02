@@ -1,17 +1,9 @@
-"use client";
-
-import { useEffect } from "react";
 import Link from "next/link";
-import { redirectIfAuthenticated } from "@/lib/auth";
 import { SignUpForm } from "@/components/auth/sign-up-form";
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 
 export default function SignUpPage() {
-  useEffect(() => {
-    redirectIfAuthenticated();
-  }, []);
-
   return (
     <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex flex-col items-center ">
