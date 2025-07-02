@@ -38,7 +38,7 @@ export const Header = () => {
               <Link href="/" className="flex items-center gap-2">
                 <Button
                   variant="noShadow"
-                  className="flex items-center  text-primary-foreground "
+                  className="flex items-center  text-primary-foreground font-black text-2xl px-3 py-2 "
                 >
                   H
                 </Button>
