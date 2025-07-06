@@ -1,14 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { FolderOpen, Plus, Search, Filter, MoreHorizontal, Edit, Trash2 } from "lucide-react"
+import { FolderOpen, Search, Filter, 
+  // MoreHorizontal, Edit, Trash2 
+} from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { CategorySyncToggle } from "./category-sync-toggle"
+// import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+// import { CategorySyncToggle } from "./category-sync-toggle"
 import type { Category } from "@/components/seller/dummy-data"
 
 interface CategoryListProps {
@@ -16,7 +18,7 @@ interface CategoryListProps {
   onSyncChange: (categoryId: string, isSync: boolean) => Promise<void>
 }
 
-export function CategoryList({ categories, onSyncChange }: CategoryListProps) {
+export function CategoryList({ categories }: CategoryListProps) {
   const [searchTerm, setSearchTerm] = React.useState("")
   const [filteredCategories, setFilteredCategories] = React.useState(categories)
 
@@ -37,10 +39,10 @@ export function CategoryList({ categories, onSyncChange }: CategoryListProps) {
           <h1 className="text-3xl font-bold tracking-tight">Manajemen Kategori</h1>
           <p className="text-muted-foreground">Kelola kategori produk dan sinkronisasi ke marketplace</p>
         </div>
-        <Button>
+        {/* <Button>
           <Plus className="w-4 h-4 mr-2" />
           Tambah Kategori
-        </Button>
+        </Button> */}
       </div>
 
       {/* Search and Filter */}
@@ -76,9 +78,9 @@ export function CategoryList({ categories, onSyncChange }: CategoryListProps) {
                 <TableHead>Nama Kategori</TableHead>
                 <TableHead>Deskripsi</TableHead>
                 <TableHead>Jumlah Produk</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Sinkronisasi</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
+                {/* <TableHead>Status</TableHead> */}
+                {/* <TableHead>Sinkronisasi</TableHead> */}
+                {/* <TableHead className="w-[50px]"></TableHead> */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -94,7 +96,7 @@ export function CategoryList({ categories, onSyncChange }: CategoryListProps) {
                   <TableCell>
                     <Badge variant="outline">{category.productCount} produk</Badge>
                   </TableCell>
-                  <TableCell>
+                  {/* <TableCell>
                     <Badge variant={category.status === "active" ? "default" : "secondary"}>
                       {category.status === "active" ? "Aktif" : "Nonaktif"}
                     </Badge>
@@ -107,8 +109,10 @@ export function CategoryList({ categories, onSyncChange }: CategoryListProps) {
                       onSyncChange={onSyncChange}
                       // lastSyncAt={category.lastSyncAt}
                     />
-                  </TableCell>
-                  <TableCell>
+                  </TableCell> */}
+                  
+                  {/* action */}
+                  {/* <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm">
@@ -126,7 +130,7 @@ export function CategoryList({ categories, onSyncChange }: CategoryListProps) {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
               ))}
             </TableBody>

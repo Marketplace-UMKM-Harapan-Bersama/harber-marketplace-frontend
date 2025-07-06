@@ -1,14 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { Package, Plus, Search, Filter, MoreHorizontal, Edit, Trash2 } from "lucide-react"
+import { Package, Search, Filter, 
+  // MoreHorizontal, Edit, Trash2 
+} from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ProductSyncToggle } from "./product-sync-toggle"
+// import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+// import { ProductSyncToggle } from "./product-sync-toggle"
 
 interface Product {
   id: string
@@ -27,7 +29,7 @@ interface ProductListProps {
   onSyncChange: (productId: string, isSync: boolean) => Promise<void>
 }
 
-export function ProductList({ products, onSyncChange }: ProductListProps) {
+export function ProductList({ products }: ProductListProps) {
   const [searchTerm, setSearchTerm] = React.useState("")
   const [filteredProducts, setFilteredProducts] = React.useState(products)
 
@@ -49,10 +51,10 @@ export function ProductList({ products, onSyncChange }: ProductListProps) {
           <h1 className="text-3xl font-bold tracking-tight">Manajemen Produk</h1>
           <p className="text-muted-foreground">Kelola produk dan sinkronisasi ke marketplace</p>
         </div>
-        <Button>
+        {/* <Button>
           <Plus className="w-4 h-4 mr-2" />
           Tambah Produk
-        </Button>
+        </Button> */}
       </div>
 
       {/* Search and Filter */}
@@ -90,9 +92,9 @@ export function ProductList({ products, onSyncChange }: ProductListProps) {
                 <TableHead>Kategori</TableHead>
                 <TableHead>Harga</TableHead>
                 <TableHead>Stok</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Sinkronisasi</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
+                {/* <TableHead>Status</TableHead>
+                <TableHead>Sinkronisasi</TableHead> */}
+                {/* <TableHead className="w-[50px]"></TableHead> */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -109,7 +111,7 @@ export function ProductList({ products, onSyncChange }: ProductListProps) {
                   <TableCell>
                     <Badge variant={product.stock > 0 ? "default" : "destructive"}>{product.stock} unit</Badge>
                   </TableCell>
-                  <TableCell>
+                  {/* <TableCell>
                     <Badge variant={product.status === "active" ? "default" : "secondary"}>
                       {product.status === "active" ? "Aktif" : "Nonaktif"}
                     </Badge>
@@ -122,8 +124,10 @@ export function ProductList({ products, onSyncChange }: ProductListProps) {
                       onSyncChange={onSyncChange}
                       lastSyncAt={product.lastSyncAt}
                     />
-                  </TableCell>
-                  <TableCell>
+                  </TableCell> */}
+
+                  {/* action */}
+                  {/* <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm">
@@ -141,7 +145,7 @@ export function ProductList({ products, onSyncChange }: ProductListProps) {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
               ))}
             </TableBody>
