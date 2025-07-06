@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Package,
@@ -91,13 +92,33 @@ export function AppSidebar({ ...props }) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader></SidebarHeader>
+      <SidebarHeader>
+        <Link
+          href="/"
+          className="flex items-center gap-2 px-4 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md transition-colors"
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+            <Image
+              src="/web-app-manifest-192x192.png"
+              alt="Logo"
+              width={24}
+              height={24}
+              className="rounded-sm"
+            />
+          </div>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="truncate font-bold">Harber Marketplace</span>
+          </div>
+        </Link>
+      </SidebarHeader>
 
       <SidebarContent>
         <SidebarMenu>
           {data.navMain.map((item) => {
             const isActive =
-              pathname === item.url || pathname.startsWith(item.url + "/");
+              item.url === "/dashboard"
+                ? pathname === "/dashboard"
+                : pathname === item.url || pathname.startsWith(item.url + "/");
 
             // Jika item memiliki sub-items (dropdown) - hanya untuk Pengiriman
             if (item.items) {
@@ -105,7 +126,10 @@ export function AppSidebar({ ...props }) {
                 <Collapsible key={item.title} asChild defaultOpen={isActive}>
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuButton tooltip={item.title} isActive={isActive}>
+                      <SidebarMenuButton
+                        tooltip={item.title}
+                        isActive={isActive}
+                      >
                         <item.icon />
                         <span>{item.title}</span>
                         <ChevronDown className="ml-auto size-4" />
