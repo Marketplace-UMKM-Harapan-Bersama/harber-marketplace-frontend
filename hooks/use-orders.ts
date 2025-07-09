@@ -123,32 +123,32 @@ export function useOrders(initialFilters?: OrderFilters) {
 }
 
 export function useOrderStats() {
-  // const [stats, setStats] = useState({
-  //   total: 0,
-  //   pending: 0,
-  //   processing: 0,
-  //   shipped: 0,
-  //   completed: 0,
-  //   cancelled: 0,
-  // });
-  // const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    processing: 0,
+    shipped: 0,
+    completed: 0,
+    cancelled: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   const fetchStats = async () => {
-  //     try {
-  //       const data = await ordersApi.getOrderStats();
-  //       setStats(data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch order stats:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await ordersApi.getOrderStats();
+        setStats(data);
+      } catch (error) {
+        console.error("Failed to fetch order stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  //   fetchStats();
-  // }, []);
+    fetchStats();
+  }, []);
 
-  // return { stats, loading };
+  return { stats, loading };
 }
 
 // Update the useOrder hook to work with the simplified API
