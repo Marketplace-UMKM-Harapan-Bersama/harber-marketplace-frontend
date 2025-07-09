@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Clock, Package, Truck, CheckCircle, Search, Filter, RefreshCw, AlertCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Clock, Package, Truck, CheckCircle, Search, Filter, RefreshCw, AlertCircle, Eye } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -10,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useOrders, useOrderStats } from "@/hooks/use-orders"
+import { useOrders } from "@/hooks/use-orders"
 import type { Order } from "@/lib/orders/types"
 import { TrackingInput } from "../shipping/tracking-input"
 
@@ -47,7 +48,8 @@ const statusConfig = {
   },
 }
 
-export function OrderManagementUpdated() {
+export function OrderManagement() {
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = React.useState("")
   const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null)
   const [activeTab, setActiveTab] = React.useState("all")
@@ -56,7 +58,35 @@ export function OrderManagementUpdated() {
   const { orders, loading, error, pagination, updateOrderStatus, updateTracking, applyFilters, refreshOrders } =
     useOrders()
 
-  const { stats } = useOrderStats()
+  const stats = React.useMemo(() => {
+    if (!orders.length) {
+      return {
+        total: 0,
+        pending: 0,
+        processing: 0,
+        shipped: 0,
+        completed: 0,
+        cancelled: 0,
+      }
+    }
+
+    const calculated = {
+      total: orders.length,
+      pending: 0,
+      processing: 0,
+      shipped: 0,
+      completed: 0,
+      cancelled: 0,
+    }
+
+    orders.forEach((order) => {
+      if (calculated.hasOwnProperty(order.status)) {
+        calculated[order.status as keyof typeof calculated]++
+      }
+    })
+
+    return calculated
+  }, [orders])
 
   // Apply search filter
   React.useEffect(() => {
@@ -77,6 +107,10 @@ export function OrderManagementUpdated() {
   const handleTrackingUpdate = async (orderId: number, trackingNumber: string, courier: string) => {
     await updateTracking(orderId, trackingNumber, courier)
     setSelectedOrder(null)
+  }
+
+  const handleViewOrder = (orderId: number) => {
+    router.push(`/dashboard/orders/${orderId}`)
   }
 
   const OrderTable = ({ orders }: { orders: Order[] }) => {
@@ -127,7 +161,11 @@ export function OrderManagementUpdated() {
             const StatusIcon = statusInfo.icon
 
             return (
-              <TableRow key={order.id}>
+              <TableRow
+                key={order.id}
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => handleViewOrder(order.id)}
+              >
                 <TableCell>
                   <code className="text-xs bg-muted px-1 py-0.5 rounded">{order.order_number}</code>
                 </TableCell>
@@ -155,7 +193,11 @@ export function OrderManagementUpdated() {
                 </TableCell>
                 <TableCell>{new Date(order.created_at).toLocaleDateString("id-ID")}</TableCell>
                 <TableCell>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
+                    <Button size="sm" variant="outline" onClick={() => handleViewOrder(order.id)}>
+                      <Eye className="h-4 w-4 mr-1" />
+                      Detail
+                    </Button>
                     {order.status === "pending" && (
                       <Button size="sm" onClick={() => handleStatusUpdate(order.id, "processing")}>
                         Proses
@@ -241,6 +283,7 @@ export function OrderManagementUpdated() {
           <Card>
             <CardHeader>
               <CardTitle>Semua Pesanan</CardTitle>
+              <CardDescription>Klik pada baris pesanan untuk melihat detail lengkap</CardDescription>
             </CardHeader>
             <CardContent>
               <OrderTable orders={orders} />

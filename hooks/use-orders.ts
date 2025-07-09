@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ordersApi } from "@/lib/orders/api";
-import type { Order, OrdersResponse, OrderFilters } from "@/lib/orders/types";
+import type { Order, OrdersResponse, OrderFilters, OrderDetail } from "@/lib/orders/types";
 import { toast } from "sonner";
 
 export function useOrders(initialFilters?: OrderFilters) {
@@ -123,30 +123,65 @@ export function useOrders(initialFilters?: OrderFilters) {
 }
 
 export function useOrderStats() {
-  const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    processing: 0,
-    shipped: 0,
-    completed: 0,
-    cancelled: 0,
-  });
+  // const [stats, setStats] = useState({
+  //   total: 0,
+  //   pending: 0,
+  //   processing: 0,
+  //   shipped: 0,
+  //   completed: 0,
+  //   cancelled: 0,
+  // });
+  // const [loading, setLoading] = useState(true);
+
+  // useEffect(() => {
+  //   const fetchStats = async () => {
+  //     try {
+  //       const data = await ordersApi.getOrderStats();
+  //       setStats(data);
+  //     } catch (error) {
+  //       console.error("Failed to fetch order stats:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchStats();
+  // }, []);
+
+  // return { stats, loading };
+}
+
+// Update the useOrder hook to work with the simplified API
+export function useOrder(id: number) {
+  const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchOrder = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await ordersApi.getOrder(id);
+      setOrder(data);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch order";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const data = await ordersApi.getOrderStats();
-        setStats(data);
-      } catch (error) {
-        console.error("Failed to fetch order stats:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (id) {
+      fetchOrder();
+    }
+  }, [id, fetchOrder]);
 
-    fetchStats();
-  }, []);
-
-  return { stats, loading };
+  return {
+    order,
+    loading,
+    error,
+    refetch: fetchOrder,
+  };
 }

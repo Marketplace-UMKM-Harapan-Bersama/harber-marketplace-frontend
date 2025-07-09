@@ -1,11 +1,10 @@
-// Order-specific types for the dashboard
 export interface OrderItem {
-  id: number;
+  id?: number;
   product_id: number;
   product_name: string;
   quantity: number;
   price: number;
-  total: number;
+  total?: number; 
 }
 
 export interface OrderCustomer {
@@ -87,4 +86,16 @@ export interface OrderFilters {
   per_page?: number;
   date_from?: string;
   date_to?: string;
+}
+
+export interface OrderDetail {
+  id: number;
+  total: number;
+  shipping_address: string;
+  order_items: OrderItem[];
+}
+
+export interface OrderDetailResponse {
+  data?: OrderDetail;
+  message?: string;
 }
