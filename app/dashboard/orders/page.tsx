@@ -1,7 +1,7 @@
 "use client";
 
 import { AppSidebar } from "@/components/seller/app-sider";
-import { OrderManagement } from "@/components/seller/orders/order-management";
+import { OrderManagementUpdated } from "@/components/seller/orders/order-management";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,30 +14,18 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { dummyOrders } from "@/components/seller/dummy-data";
+import { useEffect } from "react";
+import { isAuthenticated } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function OrdersPage() {
-  const handleStatusUpdate = async (orderId: string, status: string) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const router = useRouter();
 
-    // In real implementation, this would call the API
-    console.log(`Order ${orderId} status changed to ${status}`);
-  };
-
-  const handleTrackingUpdate = async (
-    orderId: string,
-    trackingNumber: string,
-    courier: string
-  ) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // In real implementation, this would call the API
-    console.log(
-      `Order ${orderId} tracking updated: ${courier} - ${trackingNumber}`
-    );
-  };
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      router.push("/sign-in");
+    }
+  }, [router]);
 
   return (
     <SidebarProvider>
@@ -60,11 +48,7 @@ export default function OrdersPage() {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <OrderManagement
-            orders={dummyOrders}
-            onStatusUpdate={handleStatusUpdate}
-            onTrackingUpdate={handleTrackingUpdate}
-          />
+          <OrderManagementUpdated />
         </div>
       </SidebarInset>
     </SidebarProvider>
