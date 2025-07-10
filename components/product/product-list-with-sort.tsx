@@ -246,7 +246,7 @@ export function ProductListWithSort({
   };
 
   // Loading skeleton
-  if (isProductsLoading || (categorySlug && isCategoryLoading)) {
+  if (isCategoriesLoading || (categorySlug && isCategoryLoading)) {
     return (
       <div className="relative">
         <div className="flex gap-8">
