@@ -68,7 +68,7 @@ const statusConfig = {
     variant: "destructive" as const,
   },
 };
-
+ 
 // Default status config for unknown statuses
 const defaultStatusConfig = {
   label: "Status Tidak Dikenal",
