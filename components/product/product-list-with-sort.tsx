@@ -12,11 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ProductList } from "./product-list";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  useProducts,
-  useCategories,
-  useProductsByCategory,
-} from "@/hooks/use-queries";
+import { useCategories, useProductsByCategory } from "@/hooks/use-queries";
 import { slugify } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -190,7 +186,7 @@ interface ProductListWithSortProps {
   categoryId?: number;
   categorySlug?: string;
   className?: string;
-  gridCols?: "grid-4" | "grid-6";
+  gridCols?: "grid-4" | "grid-6" | "scroll";
   itemsPerPage?: number;
 }
 
@@ -211,14 +207,6 @@ export function ProductListWithSort({
   // Use category-specific endpoint when categorySlug is provided
   const { data: categoryData, isLoading: isCategoryLoading } =
     useProductsByCategory(categorySlug || "");
-
-  // Only fetch general products when not viewing a specific category
-  const { data: productsData, isLoading: isProductsLoading } = useProducts({
-    searchQuery: !categorySlug ? searchQuery : undefined,
-    categoryId: !categorySlug ? categoryId : undefined,
-    sortBy: sort,
-    page,
-  });
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
