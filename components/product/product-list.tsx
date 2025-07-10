@@ -134,9 +134,6 @@ export function ProductList({
                 <span className="text-md font-medium">
                   {formatPrice(parseFloat(product.price))}
                 </span>
-                <span className="text-sm text-muted-foreground">
-                  Stok: {product.stock}
-                </span>
               </div>
             </div>
           </div>
