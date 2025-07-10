@@ -1,6 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
-import { getCategories, getProduct, getProducts } from "@/lib/api";
-import { slugify } from "@/lib/utils";
+import {
+  getProduct,
+  getProducts,
+  getProductCategories,
+  getProductsByCategory,
+  getCart,
+  getOrders,
+  getOrder,
+} from "@/lib/api";
+import {
+  Product,
+  PaginatedResponse,
+  Category,
+  OrderDetailResponse,
+  OrderListResponse,
+} from "@/lib/types";
 
 interface UseProductsOptions {
   sellerId?: number;
@@ -25,22 +39,12 @@ export function useProducts({
       { sellerId, excludeProduct, searchQuery, categoryId, sortBy, page },
     ],
     queryFn: async () => {
-      const response = await getProducts(categoryId);
-      let products = response.data.flatMap((seller) =>
-        seller.products.map((product) => ({
-          ...product,
-          seller: {
-            id: seller.seller_id,
-            shop_name: seller.shop_name,
-          },
-        }))
-      );
+      const response = await getProducts(categoryId, page);
+      let products = [...response.data];
 
       // Apply filters
       if (sellerId) {
-        products = products.filter(
-          (product) => product.seller?.id === sellerId
-        );
+        products = products.filter((product) => product.seller_id === sellerId);
       }
 
       if (excludeProduct) {
@@ -59,22 +63,25 @@ export function useProducts({
       // Apply sorting
       switch (sortBy) {
         case "price_asc":
-          products.sort((a, b) => a.price - b.price);
+          products.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
           break;
         case "price_desc":
-          products.sort((a, b) => b.price - a.price);
+          products.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
           break;
         case "latest":
           products.sort(
             (a, b) =>
-              new Date(b.created_at || "").getTime() -
-              new Date(a.created_at || "").getTime()
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
           );
           break;
         // For "relevance" and "trending", we'll keep the default order
       }
 
-      return products;
+      return {
+        ...response,
+        data: products,
+      } as PaginatedResponse<Product>;
     },
   });
 }
@@ -83,38 +90,8 @@ export function useProduct(slug: string) {
   return useQuery({
     queryKey: ["product", slug],
     queryFn: async () => {
-      // First get all products to find the ID from slug
-      const response = await getProducts();
-      const products = response.data.flatMap((seller) =>
-        seller.products.map((product) => ({
-          ...product,
-          seller: {
-            id: seller.seller_id,
-            shop_name: seller.shop_name,
-          },
-        }))
-      );
-
-      const productWithId = products.find(
-        (product) => slugify(product.name) === slug
-      );
-
-      if (!productWithId) {
-        throw new Error("Product not found");
-      }
-
-      // Then get the detailed product data
-      const productResponse = await getProduct(productWithId.id);
-      const productData = productResponse.data;
-
-      return {
-        ...productData,
-        seller: productData.seller ?? {
-          id: 0,
-          shop_name: "Unknown Seller",
-        },
-        category: productData.category,
-      };
+      const response = await getProduct(slug);
+      return response.data;
     },
   });
 }
@@ -123,16 +100,42 @@ export function useCategories() {
   return useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const response = await getCategories();
-      return response.data.flatMap((seller) =>
-        seller.categories.map((category) => ({
-          ...category,
-          seller: {
-            id: seller.seller_id,
-            shop_name: seller.shop_name,
-          },
-        }))
-      );
+      const response = await getProductCategories();
+      return response.data;
     },
+  }) as { data: Category[] | undefined; isLoading: boolean; error: any };
+}
+
+export function useProductsByCategory(slug: string) {
+  return useQuery({
+    queryKey: ["category-products", slug],
+    queryFn: async () => {
+      const response = await getProductsByCategory(slug);
+      return response.data;
+    },
+  });
+}
+
+export function useCart() {
+  return useQuery({
+    queryKey: ["cart"],
+    queryFn: async () => {
+      const response = await getCart();
+      return response;
+    },
+  });
+}
+
+export function useOrders() {
+  return useQuery<OrderListResponse>({
+    queryKey: ["orders"],
+    queryFn: getOrders,
+  });
+}
+
+export function useOrder(id: number) {
+  return useQuery<OrderDetailResponse>({
+    queryKey: ["order", id],
+    queryFn: () => getOrder(id),
   });
 }

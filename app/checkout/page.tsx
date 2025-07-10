@@ -17,24 +17,52 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCartStore } from "@/lib/store";
 import { formatPrice } from "@/lib/utils";
-import { createOrder } from "@/lib/api";
+import { checkoutCart, type CheckoutRequest } from "@/lib/api";
 import { toast } from "sonner";
-
-// Initial form data
-const initialFormData = {
-  shipping_address: "Jl. Mangga",
-  shipping_city: "Bandung",
-  shipping_province: "Jawa Barat",
-  shipping_postal_code: "40123",
-};
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 const SHIPPING_COST = 15000; // Rp 15.000 per seller
 
 export default function CheckoutPage() {
   const { items, getTotal, clearCart } = useCartStore();
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
   const [paymentMethod, setPaymentMethod] = React.useState("bank_transfer");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [formData, setFormData] = React.useState(initialFormData);
+
+  // Initialize form data with user data
+  const [formData, setFormData] = React.useState<CheckoutRequest>(() => ({
+    shipping_address: user?.address || "",
+    shipping_city: user?.city || "",
+    shipping_province: user?.province || "",
+    shipping_postal_code: user?.postal_code || "",
+    payment_method: paymentMethod,
+    notes: "",
+  }));
+
+  // Update form data when user data changes
+  React.useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        shipping_address: user.address || prev.shipping_address || "",
+        shipping_city: user.city || prev.shipping_city || "",
+        shipping_province: user.province || prev.shipping_province || "",
+        shipping_postal_code:
+          user.postal_code || prev.shipping_postal_code || "",
+      }));
+    }
+  }, [user]);
+
+  // Update payment method in form data when it changes
+  React.useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      payment_method: paymentMethod,
+    }));
+  }, [paymentMethod]);
+
   // Group items by seller
   const itemsBySeller = React.useMemo(() => {
     return items.reduce((acc, item) => {
@@ -74,30 +102,19 @@ export default function CheckoutPage() {
 
     setIsSubmitting(true);
     try {
-      // Create an order for each seller according to the spec
-      const orders = Object.values(itemsBySeller).map((sellerData) => ({
-        user_id: 1, // Dummy user ID
-        seller_id: sellerData.seller.id,
-        total_amount: sellerData.total,
-        shipping_cost: SHIPPING_COST,
-        payment_method: paymentMethod,
-        ...formData, // Spread the form data for shipping details
-        items: sellerData.items.map((item) => ({
-          product_id: item.id,
-          price: item.price,
-          quantity: item.quantity,
-        })),
-      }));
+      // Call the checkout API
+      const response = await checkoutCart(formData);
 
-      // Call the API to create orders
-      await createOrder(orders);
-
-      // Clear cart and show success message
+      // Clear cart after successful checkout
       clearCart();
-      toast.success("Order berhasil dibuat!");
 
-      // Redirect to success page
-      // router.push("/checkout/success");
+      // Redirect to Midtrans payment page
+      if (response.midtrans_redirect_url) {
+        window.location.href = response.midtrans_redirect_url;
+      } else {
+        toast.success("Order berhasil dibuat!");
+        router.push("/orders");
+      }
     } catch (error) {
       console.error("Checkout error:", error);
       toast.error(
@@ -121,8 +138,20 @@ export default function CheckoutPage() {
     );
   }
 
+  // Show loading state while fetching user data
+  if (isLoading) {
+    return (
+      <div className="container max-w-3xl py-8 space-y-8 mx-auto">
+        <div className="text-center">
+          <Loader className="w-6 h-6 animate-spin mx-auto" />
+          <p className="text-muted-foreground mt-2">Memuat data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <main className="container grid grid-cols-1 md:grid-cols-2 gap-8 py-8 px-5 md:px-10 h-screen overflow-y-auto md:overflow-hidden">
+    <main className="container grid grid-cols-1 md:grid-cols-2 gap-8 py-8 px-5 md:px-10">
       {/* Left Column - Information Forms */}
       <div className="space-y-8">
         <div className="flex items-center gap-4">
@@ -175,6 +204,16 @@ export default function CheckoutPage() {
                 value={formData.shipping_postal_code}
                 onChange={handleInputChange}
                 placeholder="Masukkan kode pos"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="notes">Catatan (Opsional)</Label>
+              <Input
+                id="notes"
+                name="notes"
+                value={formData.notes}
+                onChange={handleInputChange}
+                placeholder="Tambahkan catatan untuk penjual"
               />
             </div>
           </div>

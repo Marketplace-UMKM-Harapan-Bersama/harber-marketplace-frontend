@@ -10,38 +10,39 @@ import { Plus } from "lucide-react";
 import { ProductList } from "./product-list";
 import { Skeleton } from "../ui/skeleton";
 import { useCartStore } from "@/lib/store";
-import { toast } from "sonner";
 import { useProduct } from "@/hooks/use-queries";
 import { useAuth } from "@/hooks/use-auth";
+import { Product } from "@/lib/types";
 
 interface ProductDetailProps {
   slug: string;
 }
 
+interface CartItem extends Omit<Product, "price"> {
+  price: number;
+  quantity: number;
+}
+
 export function ProductDetail({ slug }: ProductDetailProps) {
   const { data: product, isLoading, error } = useProduct(slug);
   const addToCart = useCartStore((state) => state.addItem);
+  const cartLoading = useCartStore((state) => state.isLoading);
   const { isAuthed } = useAuth();
-  const handleAddToCart = () => {
-    if (!product || product.stock === undefined) return;
 
-    // Transform product data to match CartItem type
-    const cartItem = {
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      image_url: product.image_url,
-      stock: product.stock,
-      seller: {
-        id: product.seller?.id || 0,
-        shop_name: product.seller?.shop_name || "Unknown Seller",
-      },
-      category: product.category,
-    };
+  const handleAddToCart = async () => {
+    if (!product) return;
 
-    addToCart(cartItem);
-    toast.success("Produk ditambahkan ke keranjang");
+    try {
+      // Transform product data to match CartItem type
+      const cartItem: Omit<CartItem, "quantity"> = {
+        ...product,
+        price: parseFloat(product.price),
+      };
+
+      await addToCart(cartItem);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   if (isLoading) {
@@ -66,8 +67,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   return (
     <>
-      <div className="flex  flex-col items-center justify-between px-5 py-10 bg-muted rounded-md border container mx-auto">
-        <div className="flex md:flex-row flex-col w-full  gap-x-8  ">
+      <div className="flex flex-col items-center justify-between px-5 py-10 bg-muted rounded-md border container mx-auto">
+        <div className="flex md:flex-row flex-col w-full gap-x-8">
           {/* Product Image */}
           <div className="w-full md:w-1/2">
             <div className="aspect-square overflow-hidden relative">
@@ -77,9 +78,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 fill
                 className="rounded-lg h-full w-full object-cover object-center"
               />
-              {product.stock !== undefined && product.stock <= 0 && (
+              {product.stock <= 0 && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-foreground text-white px-6 py-3  font-semibold text-lg">
+                  <div className="bg-foreground text-white px-6 py-3 font-semibold text-lg">
                     Habis
                   </div>
                 </div>
@@ -90,12 +91,12 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           {/* Product Info */}
           <div className="w-full md:w-1/2 flex flex-col">
             <div className="flex items-start justify-between">
-              <h1 className="text-4xl md:text-5xl font-medium ">
+              <h1 className="text-4xl md:text-5xl font-medium">
                 <span className="block">{product.name}</span>
               </h1>
             </div>
-            <Badge className="font-mono text-xl font-bold mt-4  border-primary border-2 w-fit">
-              {formatPrice(product.price)}
+            <Badge className="font-mono text-xl font-bold mt-4 border-primary border-2 w-fit">
+              {formatPrice(parseFloat(product.price))}
             </Badge>
 
             <Separator className="my-4" />
@@ -116,18 +117,14 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       <dd>{product.seller.shop_name}</dd>
                     </div>
                   )}
-                  {product.stock !== undefined && (
-                    <div>
-                      <dt className="text-sm text-muted-foreground">Stok</dt>
-                      <dd>{product.stock} unit</dd>
-                    </div>
-                  )}
-                  {product.weight !== undefined && (
-                    <div>
-                      <dt className="text-sm text-muted-foreground">Berat</dt>
-                      <dd>{product.weight} kg</dd>
-                    </div>
-                  )}
+                  <div>
+                    <dt className="text-sm text-muted-foreground">Stok</dt>
+                    <dd>{product.stock} unit</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm text-muted-foreground">Berat</dt>
+                    <dd>{product.weight} kg</dd>
+                  </div>
                   {product.category && (
                     <div>
                       <dt className="text-sm text-muted-foreground">
@@ -143,28 +140,29 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             {/* Add to Cart Button */}
             {isAuthed ? (
               <>
-                {product.stock !== undefined && product.stock > 0 && (
+                {product.stock > 0 && (
                   <Button
-                    className="p-5  w-fit mt-8 border-2 border-primary"
+                    className="p-5 w-fit mt-8 border-2 border-primary"
                     size="lg"
                     variant="default"
                     onClick={handleAddToCart}
+                    disabled={cartLoading}
                   >
                     <Plus className="size-4 mr-2" />
-                    Tambahkan ke keranjang
+                    {cartLoading ? "Menambahkan..." : "Tambahkan ke keranjang"}
                   </Button>
                 )}
               </>
             ) : (
               <Button
-                className="p-5  w-fit mt-8 border-2 border-primary"
+                className="p-5 w-fit mt-8 border-2 border-primary"
                 asChild
               >
                 <Link href="/sign-in">Masuk untuk membeli</Link>
               </Button>
             )}
 
-            {product.stock !== undefined && product.stock <= 0 && (
+            {product.stock <= 0 && (
               <div className="flex h-full pt-4">
                 <p className="text-muted-foreground text-xl">
                   Produk ini Habis, silahkan pilih produk{" "}
@@ -176,11 +174,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             )}
           </div>
         </div>
-
-        {/* Related Products */}
       </div>
+
+      {/* Related Products */}
       <section className="w-full mt-24 mb-12">
-        <div className="container mx-auto ">
+        <div className="container mx-auto">
           <div className="flex flex-col gap-2 mb-8">
             <h2 className="text-2xl font-medium text-center">
               Produk yang mungkin Anda sukai
@@ -192,7 +190,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
           <div className="flex overflow-x-auto gap-4 no-scrollbar">
             <ProductList
-              sellerId={product.seller?.id}
+              sellerId={product.seller_id}
               gridCols="scroll"
               isPaginated={false}
               sortBy="latest"

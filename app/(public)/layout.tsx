@@ -1,5 +1,6 @@
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { CartConfirmDialogProvider } from "@/components/cart/cart-confirm-dialog-provider";
 
 export default function PublicLayout({
   children,
@@ -9,8 +10,9 @@ export default function PublicLayout({
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-1 px-5   ">{children}</main>
+      <main className="flex-1 px-5">{children}</main>
       <Footer />
+      <CartConfirmDialogProvider />
     </div>
   );
 }

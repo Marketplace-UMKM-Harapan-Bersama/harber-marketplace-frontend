@@ -7,8 +7,15 @@ import {
   type Category,
   type SellerWithProducts,
   type SellerWithCategories,
-  Order,
-  OrderResponse,
+  type User,
+  type UserResponse,
+  type CartResponse,
+  type CartItem,
+  type Order,
+  type OrderResponse,
+  type PaginatedResponse,
+  type OrderListResponse,
+  type OrderDetailResponse,
 } from "./types";
 
 const api = axios.create({
@@ -91,10 +98,10 @@ export const authService = {
     }
   },
 
-  async getUserData() {
+  async getUserData(): Promise<User> {
     try {
-      const response = await api.get("/api/user");
-      return response.data;
+      const response = await api.get<UserResponse>("/api/users");
+      return response.data.data;
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 401) {
         throw error;
@@ -104,53 +111,60 @@ export const authService = {
   },
 };
 
-const apiProduct = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_PRODUCT_URL,
-  headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-  },
-});
-
 // Product and Category API functions
 export async function getProducts(
-  categoryId?: number
-): Promise<ApiResponse<SellerWithProducts[]>> {
+  categoryId?: number,
+  page: number = 1
+): Promise<PaginatedResponse<Product>> {
   const url = categoryId
-    ? `/api/products?category_id=${categoryId}`
-    : "/api/products";
-  const response = await apiProduct.get(url);
+    ? `/api/products?category_id=${categoryId}&page=${page}`
+    : `/api/products?page=${page}`;
+  const response = await api.get(url);
   return response.data;
 }
 
-export async function getProduct(id: number): Promise<ApiResponse<Product>> {
-  const response = await apiProduct.get(`/api/products/${id}`);
+export async function getProduct(slug: string): Promise<ApiResponse<Product>> {
+  const response = await api.get(`/api/products/${slug}`);
   return response.data;
 }
 
 export async function getCategories(): Promise<
   ApiResponse<SellerWithCategories[]>
 > {
-  const response = await apiProduct.get("/api/categories");
+  const response = await api.get("/api/categories");
   return response.data;
 }
 
 export async function getCategory(id: number): Promise<ApiResponse<Category>> {
-  const response = await apiProduct.get(`/api/categories/${id}`);
+  const response = await api.get(`/api/categories/${id}`);
   return response.data;
 }
 
 export async function getSellerProducts(
   sellerId: number
 ): Promise<ApiResponse<SellerWithProducts>> {
-  const response = await apiProduct.get(`/api/sellers/${sellerId}/products`);
+  const response = await api.get(`/api/sellers/${sellerId}/products`);
+  return response.data;
+}
+
+export async function getProductCategories(): Promise<
+  PaginatedResponse<Category>
+> {
+  const response = await api.get("/api/product-categories");
+  return response.data;
+}
+
+export async function getProductsByCategory(
+  slug: string
+): Promise<ApiResponse<Category & { products: Product[] }>> {
+  const response = await api.get(`/api/product-categories/${slug}`);
   return response.data;
 }
 
 // Order API function
 export async function createOrder(orders: Order[]): Promise<OrderResponse> {
   try {
-    const response = await apiProduct.post("/api/orders", orders);
+    const response = await api.post("/api/orders", orders);
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -159,4 +173,79 @@ export async function createOrder(orders: Order[]): Promise<OrderResponse> {
     }
     throw error;
   }
+}
+
+// Cart API functions
+export async function getCart(): Promise<CartResponse> {
+  const response = await api.get("/api/cart");
+  return response.data;
+}
+
+export interface CheckoutResponse {
+  message: string;
+  order_id: number;
+  snap_token: string;
+  midtrans_redirect_url: string;
+}
+
+export interface CheckoutRequest {
+  shipping_address: string;
+  shipping_city: string;
+  shipping_province: string;
+  shipping_postal_code: string;
+  payment_method: string;
+  notes?: string;
+}
+
+export async function checkoutCart(
+  data: CheckoutRequest
+): Promise<CheckoutResponse> {
+  const response = await api.post("/api/cart/checkout", data);
+  return response.data;
+}
+
+export async function addToCart(
+  productId: number,
+  quantity: number
+): Promise<ApiResponse<CartItem>> {
+  const response = await api.post(`/api/products/${productId}/add-to-cart`, {
+    quantity,
+  });
+  return response.data;
+}
+
+export async function increaseCartItemQuantity(
+  productId: number
+): Promise<ApiResponse<CartItem>> {
+  const response = await api.patch(`/api/cart/product/${productId}/increase`);
+  return response.data;
+}
+
+export async function decreaseCartItemQuantity(
+  productId: number
+): Promise<ApiResponse<CartItem>> {
+  const response = await api.patch(`/api/cart/product/${productId}/decrease`);
+  return response.data;
+}
+
+export async function removeFromCart(
+  cartItemId: number
+): Promise<ApiResponse<void>> {
+  const response = await api.delete(`/api/cart/${cartItemId}`);
+  return response.data;
+}
+
+export async function clearCart(): Promise<ApiResponse<void>> {
+  const response = await api.delete("/api/clear-cart");
+  return response.data;
+}
+
+export async function getOrders(): Promise<OrderListResponse> {
+  const response = await api.get("/api/orders");
+  return response.data;
+}
+
+export async function getOrder(id: number): Promise<OrderDetailResponse> {
+  const response = await api.get(`/api/order/${id}`);
+  return response.data;
 }

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { formatPrice, slugify } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 import { useProducts } from "@/hooks/use-queries";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,11 @@ interface ProductListProps {
   categoryId?: number;
   sortBy?: "relevance" | "trending" | "latest" | "price_asc" | "price_desc";
   page?: number;
-  onPageChange?: (totalPages: number) => void;
+  onPageChange?: (
+    currentPage: number,
+    totalPages: number,
+    total: number
+  ) => void;
   itemsPerPage?: number;
   gridCols?: "grid-4" | "grid-6" | "scroll";
   isPaginated?: boolean;
@@ -31,12 +35,12 @@ export function ProductList({
   sortBy = "relevance",
   page = 1,
   onPageChange,
-  itemsPerPage = 10,
+  itemsPerPage = 15,
   gridCols = "grid-6",
   isPaginated = true,
 }: ProductListProps) {
   const {
-    data: products,
+    data: response,
     isLoading,
     error,
   } = useProducts({
@@ -48,13 +52,16 @@ export function ProductList({
     page,
   });
 
-  // Update total pages when products change
+  // Update pagination info when data changes
   useEffect(() => {
-    if (isPaginated && onPageChange && products) {
-      const totalPages = Math.ceil(products.length / itemsPerPage);
-      onPageChange(totalPages);
+    if (isPaginated && onPageChange && response?.meta) {
+      onPageChange(
+        response.meta.current_page,
+        response.meta.last_page,
+        response.meta.total
+      );
     }
-  }, [products, onPageChange, itemsPerPage, isPaginated]);
+  }, [response, onPageChange, isPaginated]);
 
   const gridStyles = {
     "grid-4":
@@ -86,7 +93,7 @@ export function ProductList({
     );
   }
 
-  if (!products || products.length === 0) {
+  if (!response?.data || response.data.length === 0) {
     return (
       <div className="text-center text-muted-foreground py-8">
         No products found
@@ -94,17 +101,14 @@ export function ProductList({
     );
   }
 
-  // Get displayed products based on pagination settings
-  const displayedProducts = isPaginated
-    ? products.slice((page - 1) * itemsPerPage, page * itemsPerPage)
-    : products;
+  const products = response.data;
 
   return (
     <div className={cn(gridStyles[gridCols], className)}>
-      {displayedProducts.map((product) => (
+      {products.map((product) => (
         <Link
           key={product.id}
-          href={`/products/${slugify(product.name)}`}
+          href={`/products/${product.slug}`}
           className={cn(
             "block",
             gridCols === "scroll" && "snap-start min-w-[280px] first:ml-0"
@@ -128,13 +132,11 @@ export function ProductList({
               )}
               <div className="flex items-center justify-between mt-auto">
                 <span className="text-md font-medium">
-                  {formatPrice(product.price)}
+                  {formatPrice(parseFloat(product.price))}
                 </span>
-                {/* {product.stock !== undefined && (
-                  <span className="text-sm text-muted-foreground">
-                    Stok: {product.stock}
-                  </span>
-                )} */}
+                <span className="text-sm text-muted-foreground">
+                  Stok: {product.stock}
+                </span>
               </div>
             </div>
           </div>

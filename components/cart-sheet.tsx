@@ -17,19 +17,35 @@ import { useCartStore } from "@/lib/store";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
+import { ClearCartDialog } from "./cart/clear-cart-dialog";
 
 export function CartSheet() {
   const [isOpen, setIsOpen] = React.useState(false);
-  const { items, updateQuantity, removeItem, getTotal } = useCartStore();
+  const {
+    items,
+    updateQuantity,
+    removeItem,
+    getTotal,
+    syncWithServer,
+    clearCart,
+    isLoading,
+  } = useCartStore();
   const { isAuthed } = useAuth();
+
+  // Sync cart with server when component mounts and user is authenticated
+  React.useEffect(() => {
+    if (isAuthed) {
+      syncWithServer();
+    }
+  }, [isAuthed, syncWithServer]);
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
       <SheetTrigger asChild>
-        <Button variant="noShadow" size="icon" className="relative  ">
+        <Button variant="noShadow" size="icon" className="relative">
           <ShoppingCart className="w-4 h-4" fill="currentColor" />
           {isAuthed && items.length > 0 && (
-            <span className="border border-primary-foreground absolute -top-1 rounded-md -right-1 bg-primary text-primary-foreground text-xs  w-4 h-4 flex items-center justify-center">
+            <span className="border border-primary-foreground absolute -top-1 rounded-md -right-1 bg-primary text-primary-foreground text-xs w-4 h-4 flex items-center justify-center">
               {items.length}
             </span>
           )}
@@ -37,7 +53,12 @@ export function CartSheet() {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Keranjang</SheetTitle>
+          <div className="flex items-center justify-between">
+            <SheetTitle>Keranjang</SheetTitle>
+            {items.length > 0 && (
+              <ClearCartDialog onClearCart={clearCart} isLoading={isLoading} />
+            )}
+          </div>
         </SheetHeader>
 
         <ScrollArea className="flex-1 h-[50vh]">
@@ -77,8 +98,9 @@ export function CartSheet() {
                     />
 
                     <button
-                      className="absolute z-10 -top-2 -left-2 text-muted-foreground hover:text-foreground  p-1.5 border bg-muted shadow rounded-md"
+                      className="absolute z-10 -top-2 -left-2 text-muted-foreground hover:text-foreground p-1.5 border bg-muted shadow rounded-md"
                       onClick={() => removeItem(item.id)}
+                      disabled={isLoading}
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -97,7 +119,7 @@ export function CartSheet() {
                       <p className="font-medium">{formatPrice(item.price)}</p>
                     </div>
                     <div className="absolute bottom-5 -right-1 items-center gap-2">
-                      <div className="flex items-center  rounded-md border">
+                      <div className="flex items-center rounded-md border">
                         <Button
                           variant="ghost"
                           size="icon"
@@ -105,13 +127,11 @@ export function CartSheet() {
                           onClick={() =>
                             updateQuantity(item.id, item.quantity - 1)
                           }
-                          disabled={item.quantity <= 1}
+                          disabled={item.quantity <= 1 || isLoading}
                         >
                           -
                         </Button>
-                        <span className="w-8 text-center ">
-                          {item.quantity}
-                        </span>
+                        <span className="w-8 text-center">{item.quantity}</span>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -119,7 +139,7 @@ export function CartSheet() {
                           onClick={() =>
                             updateQuantity(item.id, item.quantity + 1)
                           }
-                          disabled={item.quantity >= item.stock}
+                          disabled={item.quantity >= item.stock || isLoading}
                         >
                           +
                         </Button>

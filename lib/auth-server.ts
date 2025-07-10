@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { COOKIE_NAME } from "./auth-client";
+import { User } from "./types";
 
 /**
  * Get the authentication token from cookie on the server side
@@ -68,4 +69,12 @@ export async function redirectIfAuthenticated(): Promise<void> {
     console.error("Error in redirectIfAuthenticated:", error);
     // On error, we don't redirect to be safe
   }
+}
+
+export async function getServerUser(): Promise<User | null> {
+  const token = await getServerToken();
+  if (!token) return null;
+
+  const payload = JSON.parse(atob(token.split(".")[1]));
+  return payload.user;
 }

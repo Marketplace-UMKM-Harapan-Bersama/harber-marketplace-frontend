@@ -13,8 +13,17 @@ export default function SearchPage({ searchParams }: SearchPageProps) {
   const { q: searchQuery } = use(searchParams);
 
   return (
-    <div className="container py-6 space-y-6">
-      <ProductListWithSort searchQuery={searchQuery} gridCols="grid-4" />
+    <div className="container py-6">
+      {searchQuery ? (
+        <>
+          <h1 className="text-3xl font-bold mb-6">
+            Search Results for &quot;{searchQuery}&quot;
+          </h1>
+          <ProductListWithSort />
+        </>
+      ) : (
+        <ProductListWithSort />
+      )}
     </div>
   );
 }

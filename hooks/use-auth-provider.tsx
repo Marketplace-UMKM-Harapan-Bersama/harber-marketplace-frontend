@@ -39,8 +39,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsAuthed(authed);
 
       if (authed) {
-        const response = await authService.getUserData();
-        setUser(response);
+        const userData = await authService.getUserData();
+        setUser(userData);
       } else {
         setUser(null);
       }
