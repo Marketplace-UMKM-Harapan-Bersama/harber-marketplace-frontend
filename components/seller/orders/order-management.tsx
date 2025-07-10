@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import {
   Clock,
   Package,
@@ -11,7 +10,6 @@ import {
   Filter,
   RefreshCw,
   AlertCircle,
-  Eye,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -79,7 +77,6 @@ const defaultStatusConfig = {
 };
 
 export function OrderManagement() {
-  const router = useRouter();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null);
   const [activeTab, setActiveTab] = React.useState("all");
@@ -151,10 +148,6 @@ export function OrderManagement() {
     setSelectedOrder(null);
   };
 
-  const handleViewOrder = (orderId: number) => {
-    router.push(`/dashboard/orders/${orderId}`);
-  };
-
   const OrderTable = ({ orders }: { orders: Order[] }) => {
     if (loading) {
       return (
@@ -208,11 +201,7 @@ export function OrderManagement() {
             const StatusIcon = statusInfo.icon;
 
             return (
-              <TableRow
-                key={order.id}
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => handleViewOrder(order.id)}
-              >
+              <TableRow key={order.id}>
                 <TableCell>
                   <code className="text-xs bg-muted px-1 py-0.5 rounded">
                     {order.order_number}
@@ -252,18 +241,7 @@ export function OrderManagement() {
                   {new Date(order.created_at).toLocaleDateString("id-ID")}
                 </TableCell>
                 <TableCell>
-                  <div
-                    className="flex space-x-2"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleViewOrder(order.id)}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      Detail
-                    </Button>
+                  <div className="flex space-x-2">
                     {order.status === "pending" && (
                       <Button
                         size="sm"
@@ -372,7 +350,7 @@ export function OrderManagement() {
             <CardHeader>
               <CardTitle>Semua Pesanan</CardTitle>
               <CardDescription>
-                Klik pada baris pesanan untuk melihat detail lengkap
+                Kelola semua pesanan dari satu tempat
               </CardDescription>
             </CardHeader>
             <CardContent>
