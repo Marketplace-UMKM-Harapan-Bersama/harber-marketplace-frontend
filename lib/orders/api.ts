@@ -1,6 +1,15 @@
 import axios, { AxiosError } from "axios"
 import { getToken } from "../auth-client"
-import type { Order, OrdersResponse, OrderUpdateRequest, OrderFilters, OrderDetail } from "./types"
+import type {
+  Order,
+  OrdersResponse,
+  OrderUpdateRequest,
+  OrderFilters,
+  OrderDetail,
+  ApiOrderResponse,
+  ApiOrdersResponse,
+  ApiOrderDetailResponse,
+} from "./types"
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
@@ -22,6 +31,32 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 )
 
+// Helper function to transform API response to expected format
+const transformOrderData = (apiOrder: ApiOrderResponse): Order => {
+  return {
+    id: apiOrder.id,
+    order_number: apiOrder.order_number,
+    user_id: apiOrder.user_id,
+    seller_id: apiOrder.seller_id,
+    total_amount: Number.parseFloat(apiOrder.total_amount) || 0,
+    shipping_cost: Number.parseFloat(apiOrder.shipping_cost) || 0,
+    payment_method: apiOrder.payment_method || "",
+    status: (apiOrder.order_status || apiOrder.payment_status || "pending") as Order["status"],
+    shipping_address: apiOrder.shipping_address || "",
+    shipping_city: apiOrder.shipping_city || "",
+    shipping_province: apiOrder.shipping_province || "",
+    shipping_postal_code: apiOrder.shipping_postal_code || "",
+    tracking_number: apiOrder.tracking_number,
+    courier: apiOrder.courier,
+    notes: apiOrder.notes,
+    created_at: apiOrder.created_at,
+    updated_at: apiOrder.updated_at,
+    customer: apiOrder.customer,
+    seller: apiOrder.seller,
+    items: apiOrder.items || apiOrder.order_items,
+  }
+}
+
 export const ordersApi = {
   /**
    * Get orders with optional filters
@@ -37,8 +72,16 @@ export const ordersApi = {
       if (filters?.date_from) params.append("date_from", filters.date_from)
       if (filters?.date_to) params.append("date_to", filters.date_to)
 
-      const response = await api.get(`/api/orders?${params.toString()}`)
-      return response.data
+      const response = await api.get<ApiOrdersResponse>(`/api/orders?${params.toString()}`)
+
+      // Transform the data
+      const transformedData = response.data.data?.map(transformOrderData) || []
+
+      return {
+        data: transformedData,
+        links: response.data.links,
+        meta: response.data.meta,
+      }
     } catch (error) {
       if (error instanceof AxiosError) {
         const message = error.response?.data?.message || error.message
@@ -53,16 +96,16 @@ export const ordersApi = {
    */
   async getOrder(id: number): Promise<OrderDetail> {
     try {
-      const response = await api.get(`/api/order/${id}`)
+      const response = await api.get<ApiOrderDetailResponse>(`/api/order/${id}`)
 
       // Handle direct response (not wrapped in data object)
       if (response.data.id) {
-        return response.data
-      }
-
-      // Handle wrapped response
-      if (response.data.data) {
-        return response.data.data
+        return {
+          id: response.data.id,
+          total: Number.parseFloat(response.data.total_amount || response.data.total || "0") || 0,
+          shipping_address: response.data.shipping_address || "",
+          order_items: response.data.order_items || response.data.items || [],
+        }
       }
 
       throw new Error("Invalid response format")
@@ -86,8 +129,10 @@ export const ordersApi = {
    */
   async updateOrder(id: number, data: OrderUpdateRequest): Promise<{ data: Order }> {
     try {
-      const response = await api.put(`/api/orders/${id}`, data)
-      return response.data
+      const response = await api.put<{ data: ApiOrderResponse }>(`/api/orders/${id}`, data)
+      return {
+        data: transformOrderData(response.data.data),
+      }
     } catch (error) {
       if (error instanceof AxiosError) {
         const message = error.response?.data?.message || error.message
@@ -111,7 +156,7 @@ export const ordersApi = {
     return this.updateOrder(id, {
       tracking_number: trackingNumber,
       courier,
-      status: "shipped", 
+      status: "shipped",
     })
   },
 
