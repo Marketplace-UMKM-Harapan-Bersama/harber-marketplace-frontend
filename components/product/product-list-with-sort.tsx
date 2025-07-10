@@ -21,6 +21,10 @@ import { slugify } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Category } from "@/lib/types";
+import Image from "next/image";
+import { formatPrice } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { ProductCardSkeleton } from "./product-card-skeleton";
 
 type SortOption =
   | "relevance"
@@ -204,13 +208,14 @@ export function ProductListWithSort({
   const pathname = usePathname();
   const { data: categories, isLoading: isCategoriesLoading } = useCategories();
 
-  // Move the hook outside of conditional
-  const categoryResult = useProductsByCategory(categorySlug || "");
-  const categoryData = categorySlug ? categoryResult.data : null;
+  // Use category-specific endpoint when categorySlug is provided
+  const { data: categoryData, isLoading: isCategoryLoading } =
+    useProductsByCategory(categorySlug || "");
 
-  const { isLoading: isProductsLoading } = useProducts({
-    searchQuery,
-    categoryId: categoryData?.id || categoryId,
+  // Only fetch general products when not viewing a specific category
+  const { data: productsData, isLoading: isProductsLoading } = useProducts({
+    searchQuery: !categorySlug ? searchQuery : undefined,
+    categoryId: !categorySlug ? categoryId : undefined,
     sortBy: sort,
     page,
   });
@@ -224,8 +229,36 @@ export function ProductListWithSort({
 
   const currentCategory = pathname.split("/").pop();
 
-  // Loading skeleton for products only
-  if (isProductsLoading) {
+  // Apply sorting to category products
+  const sortedProducts = categoryData?.products
+    ? [...categoryData.products].sort((a, b) => {
+        switch (sort) {
+          case "price_asc":
+            return parseFloat(a.price) - parseFloat(b.price);
+          case "price_desc":
+            return parseFloat(b.price) - parseFloat(a.price);
+          case "latest":
+            return (
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+            );
+          default:
+            return 0;
+        }
+      })
+    : [];
+
+  const gridStyles = {
+    "grid-4":
+      "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6",
+    "grid-6":
+      "grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6",
+    scroll:
+      "flex gap-4 snap-x snap-mandatory overflow-x-auto pb-4 no-scrollbar",
+  };
+
+  // Loading skeleton
+  if (isProductsLoading || (categorySlug && isCategoryLoading)) {
     return (
       <div className="relative">
         <div className="flex gap-8">
@@ -238,13 +271,12 @@ export function ProductListWithSort({
           {/* Main Content Loading */}
           <div className="flex-1">
             {categorySlug && <Skeleton className="h-12 w-64 mb-6" />}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {Array.from({ length: 8 }).map((_, idx) => (
-                <div key={idx} className="space-y-3">
-                  <Skeleton className="h-48 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
+            <div className={cn(gridStyles[gridCols], className)}>
+              {Array.from({ length: itemsPerPage || 8 }).map((_, index) => (
+                <ProductCardSkeleton
+                  key={index}
+                  isScrollable={gridCols === "scroll"}
+                />
               ))}
             </div>
           </div>
@@ -277,19 +309,65 @@ export function ProductListWithSort({
           {categoryData && (
             <h1 className="text-3xl font-bold mb-6">{categoryData.name}</h1>
           )}
-          <ProductList
-            searchQuery={searchQuery}
-            categoryId={categoryData?.id || categoryId}
-            sortBy={sort}
-            page={page}
-            onPageChange={setTotalPages}
-            className={className}
-            gridCols={gridCols}
-            itemsPerPage={itemsPerPage}
-            isPaginated={true}
-          />
 
-          {totalPages > 1 && (
+          {/* Show either category products or search results */}
+          {categorySlug ? (
+            <div className={cn(gridStyles[gridCols], className)}>
+              {sortedProducts.map((product) => (
+                <Link
+                  key={product.id}
+                  href={`/products/${product.slug}`}
+                  className={cn(
+                    "block",
+                    gridCols === "scroll" &&
+                      "snap-start min-w-[280px] first:ml-0"
+                  )}
+                >
+                  <div className="rounded-lg group h-full overflow-hidden border-none shadow-none transition-shadow duration-300">
+                    <div className="rounded-lg relative aspect-square overflow-hidden bg-muted border group-hover:border-primary">
+                      <Image
+                        src={product.image_url}
+                        alt={product.name}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1 pt-2">
+                      <h2 className="line-clamp-1 text-base">{product.name}</h2>
+                      {product.description && (
+                        <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
+                          {product.description}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between mt-auto">
+                        <span className="text-md font-medium">
+                          {formatPrice(parseFloat(product.price))}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          Stok: {product.stock}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <ProductList
+              searchQuery={searchQuery}
+              categoryId={categoryId}
+              sortBy={sort}
+              page={page}
+              onPageChange={setTotalPages}
+              className={className}
+              gridCols={gridCols}
+              itemsPerPage={itemsPerPage}
+              isPaginated={true}
+            />
+          )}
+
+          {/* Only show pagination for non-category views */}
+          {!categorySlug && totalPages > 1 && (
             <div className="flex justify-center items-center gap-2 mt-8">
               <Button
                 variant="outline"
