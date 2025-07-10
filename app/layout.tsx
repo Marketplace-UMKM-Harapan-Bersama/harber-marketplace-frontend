@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Harber Marketplace",
-  description: "Harber Marketplace - Tempat Jual Beli Barang Bekas",
+  description: "Markerplace hub untuk UMKM di harber",
 };
 
 export default function RootLayout({

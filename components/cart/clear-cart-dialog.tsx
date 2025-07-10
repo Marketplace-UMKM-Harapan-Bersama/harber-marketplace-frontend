@@ -28,7 +28,7 @@ export function ClearCartDialog({
       <AlertDialogTrigger asChild>
         <Button variant="destructive" size="sm" disabled={isLoading}>
           <Trash2 className="w-4 h-4 mr-2" />
-          Kosongkan
+          Kosongkan Keranjang
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

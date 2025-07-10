@@ -55,9 +55,6 @@ export function CartSheet() {
         <SheetHeader>
           <div className="flex items-center justify-between">
             <SheetTitle>Keranjang</SheetTitle>
-            {items.length > 0 && (
-              <ClearCartDialog onClearCart={clearCart} isLoading={isLoading} />
-            )}
           </div>
         </SheetHeader>
 
@@ -150,6 +147,11 @@ export function CartSheet() {
               ))}
             </div>
           )}
+          <div className="flex justify-center">
+            {items.length > 0 && (
+              <ClearCartDialog onClearCart={clearCart} isLoading={isLoading} />
+            )}
+          </div>
         </ScrollArea>
         <SheetFooter>
           {isAuthed && items.length > 0 && (
