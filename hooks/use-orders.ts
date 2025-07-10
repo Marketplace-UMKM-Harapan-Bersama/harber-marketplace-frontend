@@ -1,8 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ordersApi } from "@/lib/orders/api";
-import type { Order, OrdersResponse, OrderFilters, OrderDetail } from "@/lib/orders/types";
+import type {
+  Order,
+  OrdersResponse,
+  OrderFilters,
+  OrderDetail,
+} from "@/lib/orders/types";
 import { toast } from "sonner";
 
 export function useOrders(initialFilters?: OrderFilters) {
@@ -13,6 +18,9 @@ export function useOrders(initialFilters?: OrderFilters) {
     null
   );
   const [filters, setFilters] = useState<OrderFilters>(initialFilters || {});
+
+  // Use ref to track if it's the initial mount
+  const hasFetched = useRef(false);
 
   const fetchOrders = useCallback(
     async (newFilters?: OrderFilters) => {
@@ -36,7 +44,7 @@ export function useOrders(initialFilters?: OrderFilters) {
         setLoading(false);
       }
     },
-    [filters]
+    [] // Remove filters dependency
   );
 
   const updateOrderStatus = async (orderId: number, status: string) => {
@@ -96,17 +104,24 @@ export function useOrders(initialFilters?: OrderFilters) {
     }
   };
 
-  const applyFilters = (newFilters: OrderFilters) => {
-    setFilters(newFilters);
-    fetchOrders(newFilters);
-  };
+  const applyFilters = useCallback(
+    (newFilters: OrderFilters) => {
+      setFilters(newFilters);
+      fetchOrders(newFilters);
+    },
+    [fetchOrders]
+  );
 
-  const refreshOrders = () => {
-    fetchOrders();
-  };
+  const refreshOrders = useCallback(() => {
+    fetchOrders(filters);
+  }, [fetchOrders, filters]);
 
+  // Initial fetch only
   useEffect(() => {
-    fetchOrders();
+    if (!hasFetched.current) {
+      fetchOrders();
+      hasFetched.current = true;
+    }
   }, [fetchOrders]);
 
   return {
@@ -151,7 +166,6 @@ export function useOrderStats() {
   return { stats, loading };
 }
 
-// Update the useOrder hook to work with the simplified API
 export function useOrder(id: number) {
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
