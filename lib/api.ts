@@ -100,7 +100,7 @@ export const authService = {
 
   async getUserData(): Promise<User> {
     try {
-      const response = await api.get<UserResponse>("/api/users");
+      const response = await api.get<UserResponse>("/api/user");
       return response.data.data;
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 401) {
