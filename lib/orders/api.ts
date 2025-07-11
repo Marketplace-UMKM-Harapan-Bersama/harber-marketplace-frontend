@@ -161,7 +161,7 @@ export const ordersApi = {
   ): Promise<{ data: Order }> {
     try {
       const response = await api.put<{ data: ApiOrderResponse }>(
-        `/api/orders/${id}`,
+        `/api/order/${id}`,
         data
       );
       return {
