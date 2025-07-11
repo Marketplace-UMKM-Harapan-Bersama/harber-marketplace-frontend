@@ -1,10 +1,28 @@
 export interface OrderItem {
   id?: number;
   product_id: number;
-  product_name: string;
+  product_name?: string; // Made optional since API uses product.name
   quantity: number;
   price: number;
-  total?: number; 
+  total?: number;
+  product?: {
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    price: string;
+    stock: number;
+    sku: string;
+    image_url: string;
+    weight: string;
+    is_active: number;
+    seller_id: number;
+    category_id: number;
+    seller_product_id: string;
+    last_synced_at: string;
+    created_at: string;
+    updated_at: string;
+  };
 }
 
 export interface OrderCustomer {
@@ -90,12 +108,99 @@ export interface OrderFilters {
 
 export interface OrderDetail {
   id: number;
-  total: number;
+  user_id: number;
+  seller_id: number;
+  order_number: string;
+  total_amount: string | number; // API returns string, but we'll convert to number
+  shipping_cost: string | number;
+  payment_method: string;
+  payment_status: string;
+  order_status: string;
   shipping_address: string;
+  shipping_city: string;
+  shipping_province: string;
+  shipping_postal_code: string;
+  notes?: string;
+  items: OrderItem[];
+  created_at: string;
+  updated_at: string;
+  // Computed properties for backward compatibility
+  total: number;
   order_items: OrderItem[];
 }
 
 export interface OrderDetailResponse {
   data?: OrderDetail;
   message?: string;
+}
+
+export interface ApiOrderResponse {
+  id: number;
+  user_id: number;
+  seller_id: number;
+  order_number: string;
+  total_amount: string; // response sbg string
+  shipping_cost: string; // response sbg string
+  payment_method: string;
+  payment_status: string;
+  order_status: string; // API uses order_status instead of status
+  shipping_address: string;
+  shipping_city: string;
+  shipping_province: string;
+  shipping_postal_code: string;
+  tracking_number?: string;
+  courier?: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+  customer?: OrderCustomer;
+  seller?: OrderSeller;
+  items?: OrderItem[];
+  order_items?: OrderItem[];
+}
+
+export interface ApiOrdersResponse {
+  data: ApiOrderResponse[];
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number | null;
+    last_page: number;
+    per_page: number;
+    to: number | null;
+    total: number;
+    links: Array<{
+      url: string | null;
+      label: string;
+      active: boolean;
+    }>;
+    path: string;
+  };
+}
+
+export interface ApiOrderDetailResponse {
+  id: number;
+  user_id?: number;
+  seller_id?: number;
+  order_number?: string;
+  total_amount?: string;
+  total?: string;
+  shipping_cost?: string;
+  payment_method?: string;
+  payment_status?: string;
+  order_status?: string;
+  shipping_address: string;
+  shipping_city?: string;
+  shipping_province?: string;
+  shipping_postal_code?: string;
+  notes?: string;
+  order_items?: OrderItem[];
+  items?: OrderItem[];
+  created_at?: string;
+  updated_at?: string;
 }

@@ -1,75 +1,91 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { ArrowLeft, Package, MapPin, CreditCard, Copy, AlertCircle, RefreshCw } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ordersApi } from "@/lib/orders/api"
-import type { OrderDetail } from "@/lib/orders/types"
-import { toast } from "sonner"
+import * as React from "react";
+import { useRouter } from "next/navigation";
+import {
+  ArrowLeft,
+  Package,
+  MapPin,
+  CreditCard,
+  Copy,
+  AlertCircle,
+  RefreshCw,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ordersApi } from "@/lib/orders/api";
+import type { OrderDetail } from "@/lib/orders/types";
+import { toast } from "sonner";
 
 interface OrderDetailProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }
 
 export function OrderDetail({ params }: OrderDetailProps) {
-  const router = useRouter()
-  const [order, setOrder] = React.useState<OrderDetail | null>(null)
-  const [loading, setLoading] = React.useState(true)
-  const [error, setError] = React.useState<string | null>(null)
+  const router = useRouter();
+  const [order, setOrder] = React.useState<OrderDetail | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
   const fetchOrder = React.useCallback(async (orderId: number) => {
     try {
-      setLoading(true)
-      setError(null)
-      const orderData = await ordersApi.getOrder(orderId)
-      setOrder(orderData)
+      setLoading(true);
+      setError(null);
+      const orderData = await ordersApi.getOrder(orderId);
+      setOrder(orderData);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Gagal memuat detail pesanan"
-      setError(errorMessage)
-      console.error("Error fetching order:", err)
+      const errorMessage =
+        err instanceof Error ? err.message : "Gagal memuat detail pesanan";
+      setError(errorMessage);
+      console.error("Error fetching order:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   React.useEffect(() => {
     const loadOrder = async () => {
       try {
-        const resolvedParams = await params
-        const orderId = Number.parseInt(resolvedParams.id)
+        const resolvedParams = await params;
+        const orderId = Number.parseInt(resolvedParams.id);
 
         if (isNaN(orderId)) {
-          setError("ID pesanan tidak valid")
-          setLoading(false)
-          return
+          setError("ID pesanan tidak valid");
+          setLoading(false);
+          return;
         }
 
-        await fetchOrder(orderId)
+        await fetchOrder(orderId);
       } catch (err) {
-        console.log("Error resolving params:", err)
-        setError("Gagal memuat parameter")
-        setLoading(false)
+        console.log("Error resolving params:", err);
+        setError("Gagal memuat parameter");
+        setLoading(false);
       }
-    }
+    };
 
-    loadOrder()
-  }, [params, fetchOrder])
+    loadOrder();
+  }, [params, fetchOrder]);
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast.success("Disalin ke clipboard")
-  }
+    navigator.clipboard.writeText(text);
+    toast.success("Disalin ke clipboard");
+  };
 
   const handleRetry = async () => {
     if (order?.id) {
-      await fetchOrder(order.id)
+      await fetchOrder(order.id);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -87,7 +103,7 @@ export function OrderDetail({ params }: OrderDetailProps) {
         </div>
         <Skeleton className="h-96" />
       </div>
-    )
+    );
   }
 
   if (error || !order) {
@@ -107,8 +123,12 @@ export function OrderDetail({ params }: OrderDetailProps) {
           </div>
         </AlertDescription>
       </Alert>
-    )
+    );
   }
+
+  // Safe access to order items
+  const orderItems = order.order_items || [];
+  const totalAmount = order.total || 0;
 
   return (
     <div className="space-y-6">
@@ -120,9 +140,13 @@ export function OrderDetail({ params }: OrderDetailProps) {
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold">Pesanan #{order.id}</h1>
-            <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">DUMMY DATA</div>
+            <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">
+              DUMMY DATA
+            </div>
           </div>
-          <p className="text-muted-foreground">Detail pesanan untuk order ID {order.id}</p>
+          <p className="text-muted-foreground">
+            Detail pesanan untuk order ID {order.id}
+          </p>
         </div>
       </div>
 
@@ -137,9 +161,13 @@ export function OrderDetail({ params }: OrderDetailProps) {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-muted-foreground">Order ID</span>
+              <span className="text-sm font-medium text-muted-foreground">
+                Order ID
+              </span>
               <div className="flex items-center gap-2">
-                <code className="text-sm bg-muted px-2 py-1 rounded">#{order.id}</code>
+                <code className="text-sm bg-muted px-2 py-1 rounded">
+                  #{order.id}
+                </code>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -151,17 +179,25 @@ export function OrderDetail({ params }: OrderDetailProps) {
               </div>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-muted-foreground">Total Items</span>
-              <span className="font-medium">{order.order_items.length} produk</span>
+              <span className="text-sm font-medium text-muted-foreground">
+                Total Items
+              </span>
+              <span className="font-medium">{orderItems.length} produk</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-muted-foreground">Total Quantity</span>
-              <span className="font-medium">{order.order_items.reduce((sum, item) => sum + item.quantity, 0)} pcs</span>
+              <span className="text-sm font-medium text-muted-foreground">
+                Total Quantity
+              </span>
+              <span className="font-medium">
+                {orderItems.reduce((sum, item) => sum + item.quantity, 0)} pcs
+              </span>
             </div>
             <div className="border-t pt-4">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-bold">Total Pesanan</span>
-                <span className="text-lg font-bold text-primary">Rp {order.total.toLocaleString("id-ID")}</span>
+                <span className="text-lg font-bold text-primary">
+                  Rp {totalAmount.toLocaleString("id-ID")}
+                </span>
               </div>
             </div>
           </CardContent>
@@ -177,7 +213,9 @@ export function OrderDetail({ params }: OrderDetailProps) {
           </CardHeader>
           <CardContent>
             <div className="p-4 bg-muted rounded-lg">
-              <p className="font-medium whitespace-pre-line">{order.shipping_address}</p>
+              <p className="font-medium whitespace-pre-line">
+                {order.shipping_address}
+              </p>
             </div>
             <div className="mt-4 flex gap-2">
               <Button
@@ -189,9 +227,16 @@ export function OrderDetail({ params }: OrderDetailProps) {
                 <Copy className="h-4 w-4 mr-2" />
                 Salin Alamat
               </Button>
-              <Button variant="outline" size="sm" asChild className="flex-1 bg-transparent">
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="flex-1 bg-transparent"
+              >
                 <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.shipping_address)}`}
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    order.shipping_address
+                  )}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -209,61 +254,84 @@ export function OrderDetail({ params }: OrderDetailProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
-            Item Pesanan ({order.order_items.length})
+            Item Pesanan ({orderItems.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Produk</TableHead>
-                <TableHead className="text-center">Qty</TableHead>
-                <TableHead className="text-right">Harga Satuan</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {order.order_items.map((item, index) => (
-                <TableRow key={`${item.product_id}-${index}`}>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{item.product_name}</p>
-                      <p className="text-sm text-muted-foreground">Product ID: {item.product_id}</p>
-                      <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded mt-1 inline-block">
-                        DUMMY PRODUCT
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center font-medium">{item.quantity}</TableCell>
-                  <TableCell className="text-right">Rp {item.price.toLocaleString("id-ID")}</TableCell>
-                  <TableCell className="text-right font-medium">
-                    Rp {(item.price * item.quantity).toLocaleString("id-ID")}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          {orderItems.length > 0 ? (
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Produk</TableHead>
+                    <TableHead className="text-center">Qty</TableHead>
+                    <TableHead className="text-right">Harga Satuan</TableHead>
+                    <TableHead className="text-right">Total</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {orderItems.map((item, index) => (
+                    <TableRow key={`${item.product_id}-${index}`}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">
+                            {item.product_name ||
+                              item.product?.name ||
+                              "Produk tidak dikenal"}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Product ID: {item.product_id}
+                          </p>
+                          <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded mt-1 inline-block">
+                            DUMMY PRODUCT
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center font-medium">
+                        {item.quantity}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        Rp {item.price.toLocaleString("id-ID")}
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        Rp{" "}
+                        {(item.price * item.quantity).toLocaleString("id-ID")}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
 
-          {/* Order Total Summary */}
-          <div className="mt-6 border-t pt-4">
-            <div className="flex justify-end">
-              <div className="w-64 space-y-2">
-                <div className="flex justify-between">
-                  <span>Subtotal:</span>
-                  <span>
-                    Rp{" "}
-                    {order.order_items
-                      .reduce((sum, item) => sum + item.price * item.quantity, 0)
-                      .toLocaleString("id-ID")}
-                  </span>
-                </div>
-                <div className="flex justify-between font-bold text-lg border-t pt-2">
-                  <span>Total:</span>
-                  <span>Rp {order.total.toLocaleString("id-ID")}</span>
+              {/* Order Total Summary */}
+              <div className="mt-6 border-t pt-4">
+                <div className="flex justify-end">
+                  <div className="w-64 space-y-2">
+                    <div className="flex justify-between">
+                      <span>Subtotal:</span>
+                      <span>
+                        Rp{" "}
+                        {orderItems
+                          .reduce(
+                            (sum, item) => sum + item.price * item.quantity,
+                            0
+                          )
+                          .toLocaleString("id-ID")}
+                      </span>
+                    </div>
+                    <div className="flex justify-between font-bold text-lg border-t pt-2">
+                      <span>Total:</span>
+                      <span>Rp {totalAmount.toLocaleString("id-ID")}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>Tidak ada item dalam pesanan ini</p>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 
@@ -282,5 +350,5 @@ export function OrderDetail({ params }: OrderDetailProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

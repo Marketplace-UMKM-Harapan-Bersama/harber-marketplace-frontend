@@ -1,19 +1,40 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { Clock, Package, Truck, CheckCircle, Search, Filter, RefreshCw, AlertCircle, Eye } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useOrders } from "@/hooks/use-orders"
-import type { Order } from "@/lib/orders/types"
-import { TrackingInput } from "../shipping/tracking-input"
+import * as React from "react";
+import {
+  Clock,
+  Package,
+  Truck,
+  CheckCircle,
+  Search,
+  Filter,
+  RefreshCw,
+  AlertCircle,
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useOrders } from "@/hooks/use-orders";
+import type { Order } from "@/lib/orders/types";
+import { TrackingInput } from "../shipping/tracking-input";
 
 const statusConfig = {
   pending: {
@@ -46,17 +67,31 @@ const statusConfig = {
     icon: AlertCircle,
     variant: "destructive" as const,
   },
-}
+};
+ 
+// Default status config for unknown statuses
+const defaultStatusConfig = {
+  label: "Status Tidak Dikenal",
+  icon: AlertCircle,
+  variant: "secondary" as const,
+};
 
 export function OrderManagement() {
-  const router = useRouter()
-  const [searchTerm, setSearchTerm] = React.useState("")
-  const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null)
-  const [activeTab, setActiveTab] = React.useState("all")
-  const [filters] = React.useState({})
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null);
+  const [activeTab, setActiveTab] = React.useState("all");
+  const [filters] = React.useState({});
 
-  const { orders, loading, error, pagination, updateOrderStatus, updateTracking, applyFilters, refreshOrders } =
-    useOrders()
+  const {
+    orders,
+    loading,
+    error,
+    pagination,
+    updateOrderStatus,
+    updateTracking,
+    applyFilters,
+    refreshOrders,
+  } = useOrders();
 
   const stats = React.useMemo(() => {
     if (!orders.length) {
@@ -67,7 +102,7 @@ export function OrderManagement() {
         shipped: 0,
         completed: 0,
         cancelled: 0,
-      }
+      };
     }
 
     const calculated = {
@@ -77,16 +112,16 @@ export function OrderManagement() {
       shipped: 0,
       completed: 0,
       cancelled: 0,
-    }
+    };
 
     orders.forEach((order) => {
       if (calculated.hasOwnProperty(order.status)) {
-        calculated[order.status as keyof typeof calculated]++
+        calculated[order.status as keyof typeof calculated]++;
       }
-    })
+    });
 
-    return calculated
-  }, [orders])
+    return calculated;
+  }, [orders]);
 
   // Apply search filter
   React.useEffect(() => {
@@ -94,24 +129,24 @@ export function OrderManagement() {
       applyFilters({
         search: searchTerm || undefined,
         status: activeTab === "all" ? undefined : activeTab,
-      })
-    }, 500)
+      });
+    }, 500);
 
-    return () => clearTimeout(timeoutId)
-  }, [searchTerm, activeTab, applyFilters])
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, activeTab, applyFilters]);
 
   const handleStatusUpdate = async (orderId: number, status: string) => {
-    await updateOrderStatus(orderId, status)
-  }
+    await updateOrderStatus(orderId, status);
+  };
 
-  const handleTrackingUpdate = async (orderId: number, trackingNumber: string, courier: string) => {
-    await updateTracking(orderId, trackingNumber, courier)
-    setSelectedOrder(null)
-  }
-
-  const handleViewOrder = (orderId: number) => {
-    router.push(`/dashboard/orders/${orderId}`)
-  }
+  const handleTrackingUpdate = async (
+    orderId: number,
+    trackingNumber: string,
+    courier: string
+  ) => {
+    await updateTracking(orderId, trackingNumber, courier);
+    setSelectedOrder(null);
+  };
 
   const OrderTable = ({ orders }: { orders: Order[] }) => {
     if (loading) {
@@ -127,7 +162,7 @@ export function OrderManagement() {
             </div>
           ))}
         </div>
-      )
+      );
     }
 
     if (orders.length === 0) {
@@ -136,10 +171,12 @@ export function OrderManagement() {
           <Package className="mx-auto h-12 w-12 text-muted-foreground" />
           <h3 className="mt-2 text-sm font-semibold">Tidak ada pesanan</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            {searchTerm ? "Tidak ada pesanan yang sesuai dengan pencarian." : "Belum ada pesanan masuk."}
+            {searchTerm
+              ? "Tidak ada pesanan yang sesuai dengan pencarian."
+              : "Belum ada pesanan masuk."}
           </p>
         </div>
-      )
+      );
     }
 
     return (
@@ -157,49 +194,61 @@ export function OrderManagement() {
         </TableHeader>
         <TableBody>
           {orders.map((order) => {
-            const statusInfo = statusConfig[order.status]
-            const StatusIcon = statusInfo.icon
+            // Get status config with fallback
+            const statusInfo =
+              statusConfig[order.status as keyof typeof statusConfig] ||
+              defaultStatusConfig;
+            const StatusIcon = statusInfo.icon;
 
             return (
-              <TableRow
-                key={order.id}
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => handleViewOrder(order.id)}
-              >
+              <TableRow key={order.id}>
                 <TableCell>
-                  <code className="text-xs bg-muted px-1 py-0.5 rounded">{order.order_number}</code>
+                  <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                    {order.order_number}
+                  </code>
                 </TableCell>
                 <TableCell>
                   <div>
-                    <div className="font-medium">{order.customer?.name || "N/A"}</div>
-                    <div className="text-sm text-muted-foreground">{order.customer?.email}</div>
+                    <div className="font-medium">
+                      {order.customer?.name || "N/A"}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {order.customer?.email || ""}
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="text-sm">
                     {order.items?.length || 0} produk
                     <div className="text-xs text-muted-foreground">
-                      {order.items?.[0]?.product_name}
-                      {(order.items?.length || 0) > 1 && ` +${(order.items?.length || 0) - 1} lainnya`}
+                      {order.items?.[0]?.product_name ||
+                        "Produk tidak tersedia"}
+                      {(order.items?.length || 0) > 1 &&
+                        ` +${(order.items?.length || 0) - 1} lainnya`}
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>Rp {order.total_amount.toLocaleString("id-ID")}</TableCell>
+                <TableCell>
+                  Rp {order.total_amount.toLocaleString("id-ID")}
+                </TableCell>
                 <TableCell>
                   <Badge variant={statusInfo.variant}>
                     <StatusIcon className="w-3 h-3 mr-1" />
                     {statusInfo.label}
                   </Badge>
                 </TableCell>
-                <TableCell>{new Date(order.created_at).toLocaleDateString("id-ID")}</TableCell>
                 <TableCell>
-                  <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
-                    <Button size="sm" variant="outline" onClick={() => handleViewOrder(order.id)}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      Detail
-                    </Button>
+                  {new Date(order.created_at).toLocaleDateString("id-ID")}
+                </TableCell>
+                <TableCell>
+                  <div className="flex space-x-2">
                     {order.status === "pending" && (
-                      <Button size="sm" onClick={() => handleStatusUpdate(order.id, "processing")}>
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          handleStatusUpdate(order.id, "processing")
+                        }
+                      >
                         Proses
                       </Button>
                     )}
@@ -216,12 +265,12 @@ export function OrderManagement() {
                   </div>
                 </TableCell>
               </TableRow>
-            )
+            );
           })}
         </TableBody>
       </Table>
-    )
-  }
+    );
+  };
 
   if (error) {
     return (
@@ -229,13 +278,18 @@ export function OrderManagement() {
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
           {error}
-          <Button variant="outline" size="sm" onClick={refreshOrders} className="ml-2 bg-transparent">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refreshOrders}
+            className="ml-2 bg-transparent"
+          >
             <RefreshCw className="h-4 w-4 mr-1" />
             Coba Lagi
           </Button>
         </AlertDescription>
       </Alert>
-    )
+    );
   }
 
   return (
@@ -243,8 +297,12 @@ export function OrderManagement() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Manajemen Pesanan</h1>
-          <p className="text-muted-foreground">Kelola pesanan dan update status pengiriman</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Manajemen Pesanan
+          </h1>
+          <p className="text-muted-foreground">
+            Kelola pesanan dan update status pengiriman
+          </p>
         </div>
         <Button onClick={refreshOrders} variant="outline">
           <RefreshCw className="h-4 w-4 mr-2" />
@@ -270,20 +328,30 @@ export function OrderManagement() {
       </div>
 
       {/* Orders Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-4"
+      >
         <TabsList>
           <TabsTrigger value="all">Semua ({stats.total})</TabsTrigger>
           <TabsTrigger value="pending">Menunggu ({stats.pending})</TabsTrigger>
-          <TabsTrigger value="processing">Diproses ({stats.processing})</TabsTrigger>
+          <TabsTrigger value="processing">
+            Diproses ({stats.processing})
+          </TabsTrigger>
           <TabsTrigger value="shipped">Dikirim ({stats.shipped})</TabsTrigger>
-          <TabsTrigger value="completed">Selesai ({stats.completed})</TabsTrigger>
+          <TabsTrigger value="completed">
+            Selesai ({stats.completed})
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="all">
           <Card>
             <CardHeader>
               <CardTitle>Semua Pesanan</CardTitle>
-              <CardDescription>Klik pada baris pesanan untuk melihat detail lengkap</CardDescription>
+              <CardDescription>
+                Kelola semua pesanan dari satu tempat
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <OrderTable orders={orders} />
@@ -295,10 +363,14 @@ export function OrderManagement() {
           <Card>
             <CardHeader>
               <CardTitle>Pesanan Menunggu Proses</CardTitle>
-              <CardDescription>Pesanan yang perlu segera diproses</CardDescription>
+              <CardDescription>
+                Pesanan yang perlu segera diproses
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <OrderTable orders={orders.filter((o) => o.status === "pending")} />
+              <OrderTable
+                orders={orders.filter((o) => o.status === "pending")}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -307,10 +379,14 @@ export function OrderManagement() {
           <Card>
             <CardHeader>
               <CardTitle>Pesanan Sedang Diproses</CardTitle>
-              <CardDescription>Pesanan yang sedang disiapkan untuk pengiriman</CardDescription>
+              <CardDescription>
+                Pesanan yang sedang disiapkan untuk pengiriman
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <OrderTable orders={orders.filter((o) => o.status === "processing")} />
+              <OrderTable
+                orders={orders.filter((o) => o.status === "processing")}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -319,10 +395,14 @@ export function OrderManagement() {
           <Card>
             <CardHeader>
               <CardTitle>Pesanan Sedang Dikirim</CardTitle>
-              <CardDescription>Pesanan yang sudah dikirim dan dalam perjalanan</CardDescription>
+              <CardDescription>
+                Pesanan yang sudah dikirim dan dalam perjalanan
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <OrderTable orders={orders.filter((o) => o.status === "shipped")} />
+              <OrderTable
+                orders={orders.filter((o) => o.status === "shipped")}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -331,10 +411,14 @@ export function OrderManagement() {
           <Card>
             <CardHeader>
               <CardTitle>Pesanan Selesai</CardTitle>
-              <CardDescription>Pesanan yang sudah selesai dan diterima pelanggan</CardDescription>
+              <CardDescription>
+                Pesanan yang sudah selesai dan diterima pelanggan
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <OrderTable orders={orders.filter((o) => o.status === "completed")} />
+              <OrderTable
+                orders={orders.filter((o) => o.status === "completed")}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -344,22 +428,32 @@ export function OrderManagement() {
       {pagination && pagination.total > pagination.per_page && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Menampilkan {pagination.from || 0} - {pagination.to || 0} dari {pagination.total} pesanan
+            Menampilkan {pagination.from || 0} - {pagination.to || 0} dari{" "}
+            {pagination.total} pesanan
           </div>
           <div className="flex space-x-2">
             <Button
               variant="outline"
               size="sm"
-              disabled={!pagination.links.find((l) => l.label === "&laquo; Previous")?.url}
-              onClick={() => applyFilters({ ...filters, page: pagination.current_page - 1 })}
+              disabled={
+                !pagination.links.find((l) => l.label === "&laquo; Previous")
+                  ?.url
+              }
+              onClick={() =>
+                applyFilters({ ...filters, page: pagination.current_page - 1 })
+              }
             >
               Sebelumnya
             </Button>
             <Button
               variant="outline"
               size="sm"
-              disabled={!pagination.links.find((l) => l.label === "Next &raquo;")?.url}
-              onClick={() => applyFilters({ ...filters, page: pagination.current_page + 1 })}
+              disabled={
+                !pagination.links.find((l) => l.label === "Next &raquo;")?.url
+              }
+              onClick={() =>
+                applyFilters({ ...filters, page: pagination.current_page + 1 })
+              }
             >
               Selanjutnya
             </Button>
@@ -377,11 +471,19 @@ export function OrderManagement() {
               currentTrackingNumber={selectedOrder.tracking_number}
               currentCourier={selectedOrder.courier}
               onTrackingUpdate={async (orderId, trackingNumber, courier) => {
-                await handleTrackingUpdate(Number.parseInt(orderId), trackingNumber, courier)
+                await handleTrackingUpdate(
+                  Number.parseInt(orderId),
+                  trackingNumber,
+                  courier
+                );
               }}
             />
             <div className="p-4 border-t">
-              <Button variant="outline" onClick={() => setSelectedOrder(null)} className="w-full">
+              <Button
+                variant="outline"
+                onClick={() => setSelectedOrder(null)}
+                className="w-full"
+              >
                 Batal
               </Button>
             </div>
@@ -389,5 +491,5 @@ export function OrderManagement() {
         </div>
       )}
     </div>
-  )
+  );
 }

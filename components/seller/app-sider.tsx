@@ -5,8 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
-  Package,
-  FolderOpen,
+  // Package,
+  // FolderOpen,
   ShoppingCart,
   Truck,
   BarChart3,
@@ -59,16 +59,16 @@ const data = {
       url: "/dashboard",
       icon: BarChart3,
     },
-    {
-      title: "Produk",
-      url: "/dashboard/products",
-      icon: Package,
-    },
-    {
-      title: "Kategori",
-      url: "/dashboard/categories",
-      icon: FolderOpen,
-    },
+    // {
+    //   title: "Produk",
+    //   url: "/dashboard/products",
+    //   icon: Package,
+    // },
+    // {
+    //   title: "Kategori",
+    //   url: "/dashboard/categories",
+    //   icon: FolderOpen,
+    // },
     {
       title: "Pesanan",
       url: "/dashboard/orders",
