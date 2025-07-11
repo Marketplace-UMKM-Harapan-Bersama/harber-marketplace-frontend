@@ -97,7 +97,7 @@ export const ordersApi = {
   },
 
   /**
-   * Get single order by ID - Updated for actual API
+   * Get single order by ID - Fixed to match actual API response
    */
   async getOrder(id: number): Promise<OrderDetail> {
     try {
@@ -105,34 +105,31 @@ export const ordersApi = {
         `/api/order/${id}`
       );
 
-      // Handle direct response (not wrapped in data object)
-      if (response.data.id) {
+      // The API returns data wrapped in a "data" object
+      if (response.data.data) {
+        const orderData = response.data.data;
+
         return {
-          id: response.data.id,
-          user_id: response.data.user_id || 0,
-          seller_id: response.data.seller_id || 0,
-          order_number:
-            response.data.order_number || `ORDER-${response.data.id}`,
-          total_amount:
-            response.data.total_amount || response.data.total || "0",
-          shipping_cost: response.data.shipping_cost || "0",
-          payment_method: response.data.payment_method || "",
-          payment_status: response.data.payment_status || "pending",
-          order_status: response.data.order_status || "pending",
-          shipping_address: response.data.shipping_address || "",
-          shipping_city: response.data.shipping_city || "",
-          shipping_province: response.data.shipping_province || "",
-          shipping_postal_code: response.data.shipping_postal_code || "",
-          notes: response.data.notes,
-          items: response.data.order_items || response.data.items || [],
-          created_at: response.data.created_at || new Date().toISOString(),
-          updated_at: response.data.updated_at || new Date().toISOString(),
+          id: orderData.id,
+          user_id: orderData.user_id,
+          seller_id: orderData.seller_id,
+          order_number: orderData.order_number,
+          total_amount: orderData.total_amount,
+          shipping_cost: orderData.shipping_cost,
+          payment_method: orderData.payment_method,
+          payment_status: orderData.payment_status,
+          order_status: orderData.order_status,
+          shipping_address: orderData.shipping_address,
+          shipping_city: orderData.shipping_city,
+          shipping_province: orderData.shipping_province,
+          shipping_postal_code: orderData.shipping_postal_code,
+          notes: orderData.notes,
+          items: orderData.items || [],
+          created_at: orderData.created_at,
+          updated_at: orderData.updated_at,
           // Computed properties for backward compatibility
-          total:
-            Number.parseFloat(
-              response.data.total_amount || response.data.total || "0"
-            ) || 0,
-          order_items: response.data.order_items || response.data.items || [],
+          total: Number.parseFloat(orderData.total_amount) || 0,
+          order_items: orderData.items || [],
         };
       }
 

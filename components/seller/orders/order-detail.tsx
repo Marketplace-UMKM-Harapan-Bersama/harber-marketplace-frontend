@@ -10,11 +10,19 @@ import {
   Copy,
   AlertCircle,
   RefreshCw,
+  Hash,
+  // Store,
+  // User,
+  // Truck,
+  // Calendar,
+  // Phone,
+  // Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -30,6 +38,37 @@ import { toast } from "sonner";
 interface OrderDetailProps {
   params: Promise<{ id: string }>;
 }
+
+// Helper function to get status color
+const getStatusColor = (status: string) => {
+  switch (status.toLowerCase()) {
+    case "pending":
+      return "bg-yellow-100 text-yellow-800";
+    case "processing":
+      return "bg-blue-100 text-blue-800";
+    case "shipped":
+      return "bg-purple-100 text-purple-800";
+    case "delivered":
+      return "bg-green-100 text-green-800";
+    case "completed":
+      return "bg-green-100 text-green-800";
+    case "cancelled":
+      return "bg-red-100 text-red-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
+// Helper function to format date
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString("id-ID", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
 export function OrderDetail({ params }: OrderDetailProps) {
   const router = useRouter();
@@ -97,7 +136,8 @@ export function OrderDetail({ params }: OrderDetailProps) {
             <Skeleton className="h-4 w-48" />
           </div>
         </div>
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Skeleton className="h-64" />
           <Skeleton className="h-64" />
           <Skeleton className="h-64" />
         </div>
@@ -126,9 +166,10 @@ export function OrderDetail({ params }: OrderDetailProps) {
     );
   }
 
-  // Safe access to order items
-  const orderItems = order.order_items || [];
-  const totalAmount = order.total || 0;
+  const orderItems = order.items || [];
+  const totalAmount = Number.parseFloat(order.total_amount.toString()) || 0;
+  const shippingCost = Number.parseFloat(order.shipping_cost.toString()) || 0;
+  const fullAddress = `${order.shipping_address}, ${order.shipping_city}, ${order.shipping_province} ${order.shipping_postal_code}`;
 
   return (
     <div className="space-y-6">
@@ -139,44 +180,106 @@ export function OrderDetail({ params }: OrderDetailProps) {
         </Button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold">Pesanan #{order.id}</h1>
-            <div className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">
-              DUMMY DATA
-            </div>
+            <h1 className="text-2xl font-bold">Pesanan {order.order_number}</h1>
+            <Badge className={getStatusColor(order.order_status)}>
+              {order.order_status.toUpperCase()}
+            </Badge>
           </div>
           <p className="text-muted-foreground">
-            Detail pesanan untuk order ID {order.id}
+            Dibuat pada {formatDate(order.created_at)}
           </p>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Order Summary */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* Order Information */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5" />
-              Ringkasan Pesanan
+              <Hash className="h-5 w-5" />
+              Informasi Pesanan
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-muted-foreground">
-                Order ID
+                Order Number
               </span>
               <div className="flex items-center gap-2">
                 <code className="text-sm bg-muted px-2 py-1 rounded">
-                  #{order.id}
+                  {order.order_number}
                 </code>
                 <Button
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6"
-                  onClick={() => copyToClipboard(order.id.toString())}
+                  onClick={() => copyToClipboard(order.order_number)}
                 >
                   <Copy className="h-3 w-3" />
                 </Button>
               </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium text-muted-foreground">
+                Status Pesanan
+              </span>
+              <Badge className={getStatusColor(order.order_status)}>
+                {order.order_status}
+              </Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium text-muted-foreground">
+                Status Pembayaran
+              </span>
+              <Badge className={getStatusColor(order.payment_status)}>
+                {order.payment_status}
+              </Badge>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium text-muted-foreground">
+                Metode Pembayaran
+              </span>
+              <span className="font-medium">{order.payment_method}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium text-muted-foreground">
+                Dibuat
+              </span>
+              <span className="text-sm">{formatDate(order.created_at)}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium text-muted-foreground">
+                Diperbarui
+              </span>
+              <span className="text-sm">{formatDate(order.updated_at)}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Payment Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Ringkasan Pembayaran
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium text-muted-foreground">
+                Subtotal
+              </span>
+              <span className="font-medium">
+                Rp {(totalAmount - shippingCost).toLocaleString("id-ID")}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium text-muted-foreground">
+                Ongkos Kirim
+              </span>
+              <span className="font-medium">
+                Rp {shippingCost.toLocaleString("id-ID")}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-muted-foreground">
@@ -208,20 +311,43 @@ export function OrderDetail({ params }: OrderDetailProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5" />
-              Alamat Pengiriman
+              Informasi Pengiriman
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="p-4 bg-muted rounded-lg">
-              <p className="font-medium whitespace-pre-line">
-                {order.shipping_address}
-              </p>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground">
+                Alamat Lengkap
+              </label>
+              <div className="p-3 bg-muted rounded-lg">
+                <p className="text-sm whitespace-pre-line">{fullAddress}</p>
+              </div>
             </div>
-            <div className="mt-4 flex gap-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">
+                  Kota
+                </label>
+                <p className="text-sm font-medium">{order.shipping_city}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">
+                  Provinsi
+                </label>
+                <p className="text-sm font-medium">{order.shipping_province}</p>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">
+                Kode Pos
+              </label>
+              <p className="text-sm font-medium">{order.shipping_postal_code}</p>
+            </div>
+            <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => copyToClipboard(order.shipping_address)}
+                onClick={() => copyToClipboard(fullAddress)}
                 className="flex-1"
               >
                 <Copy className="h-4 w-4 mr-2" />
@@ -231,11 +357,11 @@ export function OrderDetail({ params }: OrderDetailProps) {
                 variant="outline"
                 size="sm"
                 asChild
-                className="flex-1 bg-transparent"
+                className="flex-1"
               >
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                    order.shipping_address
+                    fullAddress
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -248,6 +374,23 @@ export function OrderDetail({ params }: OrderDetailProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Notes (if available) */}
+      {order.notes && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              Catatan Pesanan
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm whitespace-pre-line">{order.notes}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Order Items */}
       <Card>
@@ -273,7 +416,7 @@ export function OrderDetail({ params }: OrderDetailProps) {
                   {orderItems.map((item, index) => (
                     <TableRow key={`${item.product_id}-${index}`}>
                       <TableCell>
-                        <div>
+                        <div className="space-y-1">
                           <p className="font-medium">
                             {item.product_name ||
                               item.product?.name ||
@@ -282,9 +425,11 @@ export function OrderDetail({ params }: OrderDetailProps) {
                           <p className="text-sm text-muted-foreground">
                             Product ID: {item.product_id}
                           </p>
-                          <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded mt-1 inline-block">
-                            DUMMY PRODUCT
-                          </div>
+                          {item.product?.sku && (
+                            <p className="text-xs text-muted-foreground">
+                              SKU: {item.product.sku}
+                            </p>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="text-center font-medium">
@@ -317,6 +462,10 @@ export function OrderDetail({ params }: OrderDetailProps) {
                           )
                           .toLocaleString("id-ID")}
                       </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Ongkos Kirim:</span>
+                      <span>Rp {shippingCost.toLocaleString("id-ID")}</span>
                     </div>
                     <div className="flex justify-between font-bold text-lg border-t pt-2">
                       <span>Total:</span>
