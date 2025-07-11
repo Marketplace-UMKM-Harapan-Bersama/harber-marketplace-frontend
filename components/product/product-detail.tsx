@@ -67,16 +67,21 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-between px-5 py-10 bg-muted rounded-md border container mx-auto">
+      <div className="flex flex-col items-center justify-between px-5 py-5 md:px-10 md:py-10 bg-muted rounded-md border container mx-auto">
         <div className="flex md:flex-row flex-col w-full gap-x-8">
           {/* Product Image */}
           <div className="w-full md:w-1/2">
             <div className="aspect-square overflow-hidden relative">
               <Image
-                src={product.image_url}
+                src={product.image_url || "/default-image.png"}
                 alt={product.name}
                 fill
-                className="rounded-lg h-full w-full object-cover object-center"
+                onError={(e) => {
+                  e.currentTarget.srcset = "";
+                  e.currentTarget.src = "/default-image.png";
+                }}
+                placeholder="empty"
+                className="rounded-lg h-full w-full object-cover object-center fade-in-0"
               />
               {product.stock <= 0 && (
                 <div className="absolute inset-0 flex items-center justify-center">

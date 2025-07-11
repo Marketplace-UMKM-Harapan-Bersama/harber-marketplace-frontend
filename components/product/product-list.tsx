@@ -114,19 +114,24 @@ export function ProductList({
             gridCols === "scroll" && "snap-start min-w-[280px] first:ml-0"
           )}
         >
-          <div className="rounded-lg group h-full overflow-hidden border-none shadow-none transition-shadow duration-300">
-            <div className="rounded-lg relative aspect-square overflow-hidden bg-muted border group-hover:border-primary">
+          <div className="rounded-t-lg  group h-full overflow-hidden border-none shadow-none transition-shadow duration-300">
+            <div className=" rounded-lg relative aspect-square overflow-hidden bg-muted border group-hover:border-primary">
               <Image
-                src={product.image_url}
+                src={product.image_url || "/default-image.png"}
                 alt={product.name}
                 fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                onError={(e) => {
+                  e.currentTarget.srcset = "";
+                  e.currentTarget.src = "/default-image.png";
+                }}
+                placeholder="empty"
+                className="object-cover h-full transition-transform duration-300 group-hover:scale-105 fade-in-0 "
               />
             </div>
             <div className="flex flex-col gap-1 pt-2">
               <h2 className="line-clamp-1 text-base">{product.name}</h2>
               {product.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
+                <p className="text-sm text-muted-foreground line-clamp-2 max-w-[200px] break-words">
                   {product.description}
                 </p>
               )}
