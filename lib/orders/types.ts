@@ -1,7 +1,7 @@
 export interface OrderItem {
   id?: number;
   product_id: number;
-  product_name?: string; // Made optional since API uses product.name
+  product_name?: string;
   quantity: number;
   price: number;
   total?: number;
@@ -111,7 +111,7 @@ export interface OrderDetail {
   user_id: number;
   seller_id: number;
   order_number: string;
-  total_amount: string | number; // API returns string, but we'll convert to number
+  total_amount: string | number;
   shipping_cost: string | number;
   payment_method: string;
   payment_status: string;
@@ -139,11 +139,11 @@ export interface ApiOrderResponse {
   user_id: number;
   seller_id: number;
   order_number: string;
-  total_amount: string; // response sbg string
-  shipping_cost: string; // response sbg string
+  total_amount: string;
+  shipping_cost: string;
   payment_method: string;
   payment_status: string;
-  order_status: string; // API uses order_status instead of status
+  order_status: string;
   shipping_address: string;
   shipping_city: string;
   shipping_province: string;
@@ -183,24 +183,25 @@ export interface ApiOrdersResponse {
   };
 }
 
+// Updated API response type to match actual response
 export interface ApiOrderDetailResponse {
-  id: number;
-  user_id?: number;
-  seller_id?: number;
-  order_number?: string;
-  total_amount?: string;
-  total?: string;
-  shipping_cost?: string;
-  payment_method?: string;
-  payment_status?: string;
-  order_status?: string;
-  shipping_address: string;
-  shipping_city?: string;
-  shipping_province?: string;
-  shipping_postal_code?: string;
-  notes?: string;
-  order_items?: OrderItem[];
-  items?: OrderItem[];
-  created_at?: string;
-  updated_at?: string;
+  data: {
+    id: number;
+    user_id: number;
+    seller_id: number;
+    order_number: string;
+    total_amount: string;
+    shipping_cost: string;
+    payment_method: string;
+    payment_status: string;
+    order_status: string;
+    shipping_address: string;
+    shipping_city: string;
+    shipping_province: string;
+    shipping_postal_code: string;
+    notes?: string;
+    items: OrderItem[];
+    created_at: string;
+    updated_at: string;
+  };
 }

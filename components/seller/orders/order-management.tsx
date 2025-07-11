@@ -10,6 +10,8 @@ import {
   Filter,
   RefreshCw,
   AlertCircle,
+  Eye,
+  X,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -35,6 +37,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useOrders } from "@/hooks/use-orders";
 import type { Order } from "@/lib/orders/types";
 import { TrackingInput } from "../shipping/tracking-input";
+import { useRouter } from "next/navigation";
 
 const statusConfig = {
   pending: {
@@ -76,18 +79,51 @@ const defaultStatusConfig = {
   variant: "secondary" as const,
 };
 
+// Coming Soon Modal Component
+const ComingSoonModal = ({ isOpen, onClose, feature }: { isOpen: boolean; onClose: () => void; feature: string }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div className="bg-background rounded-lg max-w-md w-full p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold">Fitur Segera Hadir</h3>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="text-center py-4">
+          <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+          <p className="text-muted-foreground mb-4">
+            Fitur <strong>{feature}</strong> sedang dalam pengembangan dan akan segera tersedia.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Terima kasih atas kesabaran Anda!
+          </p>
+        </div>
+        <Button onClick={onClose} className="w-full">
+          Tutup
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 export function OrderManagement() {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null);
   const [activeTab, setActiveTab] = React.useState("all");
   const [filters] = React.useState({});
+  const [showComingSoon, setShowComingSoon] = React.useState(false);
+  const [comingSoonFeature, setComingSoonFeature] = React.useState("");
 
   const {
     orders,
     loading,
     error,
     pagination,
-    updateOrderStatus,
+    // updateOrderStatus,
     updateTracking,
     applyFilters,
     refreshOrders,
@@ -135,8 +171,13 @@ export function OrderManagement() {
     return () => clearTimeout(timeoutId);
   }, [searchTerm, activeTab, applyFilters]);
 
-  const handleStatusUpdate = async (orderId: number, status: string) => {
-    await updateOrderStatus(orderId, status);
+  const handleStatusUpdate = async (orderId: number, status: string, featureName: string) => {
+    // Show coming soon modal instead of actual update
+    setComingSoonFeature(featureName);
+    setShowComingSoon(true);
+    
+    // Original code commented out for future use:
+    // await updateOrderStatus(orderId, status);
   };
 
   const handleTrackingUpdate = async (
@@ -146,6 +187,10 @@ export function OrderManagement() {
   ) => {
     await updateTracking(orderId, trackingNumber, courier);
     setSelectedOrder(null);
+  };
+
+  const handleViewDetail = (orderId: number) => {
+    router.push(`/dashboard/orders/${orderId}`);
   };
 
   const OrderTable = ({ orders }: { orders: Order[] }) => {
@@ -242,18 +287,35 @@ export function OrderManagement() {
                 </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
+                    {/* Detail Button - Always shown */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleViewDetail(order.id)}
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      Detail
+                    </Button>
+                    
+                    {/* Status Update Buttons */}
                     {order.status === "pending" && (
                       <Button
                         size="sm"
                         onClick={() =>
-                          handleStatusUpdate(order.id, "processing")
+                          handleStatusUpdate(order.id, "processing", "Update Status ke Diproses")
                         }
                       >
                         Proses
                       </Button>
                     )}
                     {order.status === "processing" && (
-                      <Button size="sm" onClick={() => setSelectedOrder(order)}>
+                      <Button 
+                        size="sm" 
+                        onClick={() => {
+                          setComingSoonFeature("Input Tracking & Pengiriman");
+                          setShowComingSoon(true);
+                        }}
+                      >
                         Kirim
                       </Button>
                     )}
@@ -490,6 +552,13 @@ export function OrderManagement() {
           </div>
         </div>
       )}
+
+      {/* Coming Soon Modal */}
+      <ComingSoonModal
+        isOpen={showComingSoon}
+        onClose={() => setShowComingSoon(false)}
+        feature={comingSoonFeature}
+      />
     </div>
   );
 }
