@@ -3,6 +3,8 @@ export interface Seller {
   shop_name: string;
   shop_url: string;
   shop_description: string;
+  client_id: string;
+  client_secret: string;
 }
 
 export interface Category {
@@ -172,6 +174,7 @@ export interface OrderResponse {
 }
 
 export interface User {
+  seller?: Seller;
   id: number;
   name: string;
   email: string;
