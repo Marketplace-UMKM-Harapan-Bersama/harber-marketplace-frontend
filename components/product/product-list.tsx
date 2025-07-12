@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getProductImageUrl } from "@/lib/utils";
 import { useProducts } from "@/hooks/use-queries";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ interface ProductListProps {
   onPageChange?: (
     currentPage: number,
     totalPages: number,
-    total: number,
+    total: number
   ) => void;
   itemsPerPage?: number;
   gridCols?: "grid-4" | "grid-6" | "scroll";
@@ -58,7 +58,7 @@ export function ProductList({
       onPageChange(
         response.meta.current_page,
         response.meta.last_page,
-        response.meta.total,
+        response.meta.total
       );
     }
   }, [response, onPageChange, isPaginated]);
@@ -111,13 +111,13 @@ export function ProductList({
           href={`/products/${product.slug}`}
           className={cn(
             "block",
-            gridCols === "scroll" && "snap-start min-w-[280px] first:ml-0",
+            gridCols === "scroll" && "snap-start min-w-[280px] first:ml-0"
           )}
         >
           <div className="rounded-t-lg  group h-full overflow-hidden border-none shadow-none transition-shadow duration-300">
             <div className=" rounded-lg relative aspect-square overflow-hidden bg-muted border group-hover:border-primary">
               <Image
-                src={product.image_url || "/default-image.png"}
+                src={getProductImageUrl(product.image_url, product.seller)}
                 alt={product.name}
                 fill
                 onError={(e) => {

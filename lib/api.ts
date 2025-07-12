@@ -16,6 +16,7 @@ import {
   type PaginatedResponse,
   type OrderListResponse,
   type OrderDetailResponse,
+  Seller,
 } from "./types";
 
 const api = axios.create({
@@ -140,10 +141,15 @@ export async function getCategory(id: number): Promise<ApiResponse<Category>> {
   return response.data;
 }
 
+export async function getSeller(id: number): Promise<ApiResponse<Seller>> {
+  const response = await api.get(`/api/seller/${id}`);
+  return response.data;
+}
+
 export async function getSellerProducts(
   sellerId: number
 ): Promise<ApiResponse<SellerWithProducts>> {
-  const response = await api.get(`/api/sellers/${sellerId}/products`);
+  const response = await api.get(`/api/seller/${sellerId}/products`);
   return response.data;
 }
 

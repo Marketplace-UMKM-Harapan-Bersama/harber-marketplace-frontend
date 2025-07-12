@@ -7,6 +7,7 @@ import {
   getCart,
   getOrders,
   getOrder,
+  getSeller,
 } from "@/lib/api";
 import {
   Product,
@@ -14,6 +15,7 @@ import {
   Category,
   OrderDetailResponse,
   OrderListResponse,
+  Seller,
 } from "@/lib/types";
 
 interface UseProductsOptions {
@@ -40,7 +42,26 @@ export function useProducts({
     ],
     queryFn: async () => {
       const response = await getProducts(categoryId, page);
-      let products = [...response.data];
+
+      const productsWithSellers = await Promise.all(
+        response.data.map(async (product) => {
+          if (product.image_url && !product.image_url.startsWith("http")) {
+            try {
+              const sellerResponse = await getSeller(product.seller_id);
+              return { ...product, seller: sellerResponse.data };
+            } catch (error) {
+              console.error(
+                `Failed to fetch seller for product ${product.id}`,
+                error
+              );
+              return product;
+            }
+          }
+          return product;
+        })
+      );
+
+      let products = [...productsWithSellers];
 
       // Apply filters
       if (sellerId) {
@@ -81,7 +102,7 @@ export function useProducts({
       return {
         ...response,
         data: products,
-      } as PaginatedResponse<Product>;
+      } as PaginatedResponse<Product & { seller?: Seller }>;
     },
   });
 }
@@ -111,7 +132,30 @@ export function useProductsByCategory(slug: string) {
     queryKey: ["category-products", slug],
     queryFn: async () => {
       const response = await getProductsByCategory(slug);
-      return response.data;
+      const categoryData = response.data;
+
+      if (categoryData?.products) {
+        const productsWithSellers = await Promise.all(
+          categoryData.products.map(async (product) => {
+            if (product.image_url && !product.image_url.startsWith("http")) {
+              try {
+                const sellerResponse = await getSeller(product.seller_id);
+                return { ...product, seller: sellerResponse.data };
+              } catch (error) {
+                console.error(
+                  `Failed to fetch seller for product ${product.id}`,
+                  error
+                );
+                return product;
+              }
+            }
+            return product;
+          })
+        );
+        categoryData.products = productsWithSellers as Product[];
+      }
+
+      return categoryData;
     },
   });
 }

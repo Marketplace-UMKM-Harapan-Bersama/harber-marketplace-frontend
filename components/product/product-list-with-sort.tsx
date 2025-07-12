@@ -18,7 +18,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Category } from "@/lib/types";
 import Image from "next/image";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getProductImageUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { ProductCardSkeleton } from "./product-card-skeleton";
 
@@ -314,7 +314,10 @@ export function ProductListWithSort({
                   <div className="rounded-lg group h-full overflow-hidden border-none shadow-none transition-shadow duration-300">
                     <div className="rounded-lg relative aspect-square overflow-hidden bg-muted border group-hover:border-primary">
                       <Image
-                        src={product.image_url || "/default-image.png"}
+                        src={getProductImageUrl(
+                          product.image_url,
+                          product.seller
+                        )}
                         alt={product.name}
                         fill
                         onError={(e) => {

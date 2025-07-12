@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { getProductImageUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -73,7 +74,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           <div className="w-full md:w-1/2">
             <div className="aspect-square overflow-hidden relative">
               <Image
-                src={product.image_url || "/default-image.png"}
+                src={getProductImageUrl(product.image_url, product.seller)}
                 alt={product.name}
                 fill
                 onError={(e) => {
