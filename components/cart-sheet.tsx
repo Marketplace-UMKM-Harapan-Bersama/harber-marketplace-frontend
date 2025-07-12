@@ -12,7 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getProductImageUrl } from "@/lib/utils";
 import { useCartStore } from "@/lib/store";
 import Image from "next/image";
 import Link from "next/link";
@@ -88,7 +88,7 @@ export function CartSheet() {
                 >
                   <div className="aspect-square h-20 border rounded-md relative">
                     <Image
-                      src={item.image_url}
+                      src={getProductImageUrl(item.image_url, item.seller as { shop_url?: string | null })}
                       alt={item.name}
                       fill
                       className="object-cover rounded-md"

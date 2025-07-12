@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getProductImageUrl } from "@/lib/utils";
 import { Package, Truck, Clock, CheckCircle, ArrowLeft } from "lucide-react";
 import { useOrder } from "@/hooks/use-queries";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -256,7 +256,7 @@ export default function OrderDetailPage() {
                 <div key={item.id} className="flex gap-4">
                   <div className="relative w-20 h-20 border rounded-md overflow-hidden">
                     <Image
-                      src={item.product.image_url}
+                      src={getProductImageUrl(item.product.image_url, item.product.seller)}
                       alt={item.product.name}
                       fill
                       className="object-cover"
@@ -293,7 +293,7 @@ export default function OrderDetailPage() {
                 <span className="font-medium">
                   {formatPrice(
                     parseFloat(order.total_amount) +
-                      parseFloat(order.shipping_cost)
+                    parseFloat(order.shipping_cost)
                   )}
                 </span>
               </div>

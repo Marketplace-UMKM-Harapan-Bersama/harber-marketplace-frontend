@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCartStore } from "@/lib/store";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getProductImageUrl } from "@/lib/utils";
 import { checkoutCart, type CheckoutRequest } from "@/lib/api";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
@@ -252,7 +252,7 @@ export default function CheckoutPage() {
                   <div key={item.id} className="flex gap-4">
                     <div className="relative w-16 h-16 border rounded-md overflow-hidden">
                       <Image
-                        src={item.image_url}
+                        src={getProductImageUrl(item.image_url, item.seller as { shop_url?: string | null })}
                         alt={item.name}
                         fill
                         className="object-cover"
