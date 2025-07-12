@@ -273,6 +273,7 @@ export function SignUpForm({
               />
               {role === "seller" && (
                 <>
+                  <hr />
                   <FormField
                     control={form.control}
                     name="shop_name"

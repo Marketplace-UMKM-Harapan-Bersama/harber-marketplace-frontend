@@ -65,7 +65,7 @@ export function UserButton() {
           </span>
         </DropdownMenuLabel>
         <DropdownMenuItem asChild>
-          <Link href={user?.role === "seller" ? "/dashboard" : "/orders"}>
+          <Link href={user?.role === "seller" ? "/dashboard" : "/dashboard/orders"}>
             {user?.role === "seller" ? (
               <>
                 <LayoutDashboard className="w-4 h-4" />

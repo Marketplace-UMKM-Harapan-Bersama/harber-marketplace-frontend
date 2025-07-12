@@ -116,7 +116,7 @@ export function OrderManagement() {
   const [activeTab, setActiveTab] = React.useState("all");
   const [filters] = React.useState({});
   const [showComingSoon, setShowComingSoon] = React.useState(false);
-  const [comingSoonFeature, setComingSoonFeature] = React.useState("");
+  const [comingSoonFeature] = React.useState("");
 
   const {
     orders,
@@ -171,14 +171,14 @@ export function OrderManagement() {
     return () => clearTimeout(timeoutId);
   }, [searchTerm, activeTab, applyFilters]);
 
-  const handleStatusUpdate = async (orderId: number, status: string, featureName: string) => {
-    // Show coming soon modal instead of actual update
-    setComingSoonFeature(featureName);
-    setShowComingSoon(true);
+  // const handleStatusUpdate = async (orderId: number, status: string, featureName: string) => {
+  //   // Show coming soon modal instead of actual update
+  //   setComingSoonFeature(featureName);
+  //   setShowComingSoon(true);
     
-    // Original code commented out for future use:
-    // await updateOrderStatus(orderId, status);
-  };
+  //   // Original code commented out for future use:
+  //   // await updateOrderStatus(orderId, status);
+  // };
 
   const handleTrackingUpdate = async (
     orderId: number,
@@ -298,7 +298,7 @@ export function OrderManagement() {
                     </Button>
                     
                     {/* Status Update Buttons */}
-                    {order.status === "pending" && (
+                    {/* {order.status === "pending" && (
                       <Button
                         size="sm"
                         onClick={() =>
@@ -318,7 +318,7 @@ export function OrderManagement() {
                       >
                         Kirim
                       </Button>
-                    )}
+                    )} */}
                     {order.status === "shipped" && order.tracking_number && (
                       <Badge variant="outline" className="text-xs">
                         {order.courier?.toUpperCase()} - {order.tracking_number}
