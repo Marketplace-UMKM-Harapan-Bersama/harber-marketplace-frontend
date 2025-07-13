@@ -123,6 +123,17 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       <dd>{product.seller.shop_name}</dd>
                     </div>
                   )}
+                  {product.seller && (
+                    <div>
+                      <dt className="text-sm text-muted-foreground">Toko URL</dt>
+                      <a
+                        href={`${product.seller.shop_url}`}
+                        className="text-primary hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >{product.seller.shop_url}</a>
+                    </div>
+                  )}
                   <div>
                     <dt className="text-sm text-muted-foreground">Stok</dt>
                     <dd>{product.stock} unit</dd>
