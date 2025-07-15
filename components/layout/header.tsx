@@ -30,7 +30,7 @@ export const Header = () => {
         link="/search"
         close={false}
       />
-      <header className="sticky top-0 z-50 w-full bg-background container mx-auto">
+      <header className="sticky top-0 z-50 w-full bg-background ">
         <div className="px-4 py-4">
           <div className="flex items-center justify-between w-full gap-4">
             {/* Logo */}

@@ -67,7 +67,7 @@ export function ProductList({
     "grid-4":
       "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6",
     "grid-6":
-      "grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6",
+      "grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5  gap-6",
     scroll:
       "flex gap-4 snap-x snap-mandatory overflow-x-auto pb-4 no-scrollbar",
   };

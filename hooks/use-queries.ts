@@ -41,7 +41,14 @@ export function useProducts({
       { sellerId, excludeProduct, searchQuery, categoryId, sortBy, page },
     ],
     queryFn: async () => {
-      const response = await getProducts(categoryId, page);
+      const response = await getProducts({
+        categoryId,
+        page,
+        searchQuery,
+        sortBy,
+        sellerId,
+        excludeProduct,
+      });
 
       const productsWithSellers = await Promise.all(
         response.data.map(async (product) => {
@@ -62,42 +69,6 @@ export function useProducts({
       );
 
       let products = [...productsWithSellers];
-
-      // Apply filters
-      if (sellerId) {
-        products = products.filter((product) => product.seller_id === sellerId);
-      }
-
-      if (excludeProduct) {
-        products = products.filter((product) => product.id !== excludeProduct);
-      }
-
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        products = products.filter(
-          (product) =>
-            product.name.toLowerCase().includes(query) ||
-            product.description?.toLowerCase().includes(query)
-        );
-      }
-
-      // Apply sorting
-      switch (sortBy) {
-        case "price_asc":
-          products.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-          break;
-        case "price_desc":
-          products.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
-          break;
-        case "latest":
-          products.sort(
-            (a, b) =>
-              new Date(b.created_at).getTime() -
-              new Date(a.created_at).getTime()
-          );
-          break;
-        // For "relevance" and "trending", we'll keep the default order
-      }
 
       return {
         ...response,
@@ -125,6 +96,17 @@ export function useCategories() {
       return response.data;
     },
   }) as { data: Category[] | undefined; isLoading: boolean; error: any };
+}
+
+export function usePaginatedProductCategories(page: number) {
+  return useQuery({
+    queryKey: ["product-categories", { page }],
+    queryFn: async () => {
+      const response = await getProductCategories(page);
+      return response;
+    },
+    placeholderData: (previousData) => previousData,
+  });
 }
 
 export function useProductsByCategory(slug: string) {

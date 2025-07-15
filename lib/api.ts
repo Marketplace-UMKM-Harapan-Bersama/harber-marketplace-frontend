@@ -113,14 +113,32 @@ export const authService = {
 };
 
 // Product and Category API functions
-export async function getProducts(
-  categoryId?: number,
-  page: number = 1
-): Promise<PaginatedResponse<Product>> {
-  const url = categoryId
-    ? `/api/products?category_id=${categoryId}&page=${page}`
-    : `/api/products?page=${page}`;
-  const response = await api.get(url);
+export async function getProducts({
+  categoryId,
+  page = 1,
+  searchQuery,
+  sortBy,
+  sellerId,
+  excludeProduct,
+}: {
+  categoryId?: number;
+  page?: number;
+  searchQuery?: string;
+  sortBy?: string;
+  sellerId?: number;
+  excludeProduct?: number;
+}): Promise<PaginatedResponse<Product>> {
+  const params = new URLSearchParams({
+    page: String(page),
+  });
+
+  if (categoryId) params.set("category_id", String(categoryId));
+  if (searchQuery) params.set("q", searchQuery);
+  if (sortBy) params.set("sort_by", sortBy);
+  if (sellerId) params.set("seller_id", String(sellerId));
+  if (excludeProduct) params.set("exclude", String(excludeProduct));
+
+  const response = await api.get(`/api/products?${params.toString()}`);
   return response.data;
 }
 
@@ -153,10 +171,10 @@ export async function getSellerProducts(
   return response.data;
 }
 
-export async function getProductCategories(): Promise<
-  PaginatedResponse<Category>
-> {
-  const response = await api.get("/api/product-categories");
+export async function getProductCategories(
+  page: number = 1
+): Promise<PaginatedResponse<Category>> {
+  const response = await api.get(`/api/product-categories?page=${page}`);
   return response.data;
 }
 

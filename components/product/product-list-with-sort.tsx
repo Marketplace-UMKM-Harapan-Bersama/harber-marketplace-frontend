@@ -10,6 +10,15 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { ProductList } from "./product-list";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCategories, useProductsByCategory } from "@/hooks/use-queries";
@@ -21,6 +30,7 @@ import Image from "next/image";
 import { formatPrice, getProductImageUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { ProductCardSkeleton } from "./product-card-skeleton";
+import { usePaginatedProductCategories } from "@/hooks/use-queries";
 
 type SortOption =
   | "relevance"
@@ -39,15 +49,25 @@ const sortOptions = [
 
 // Memoized Category Sidebar Component
 const CategorySidebar = memo(function CategorySidebar({
-  categories,
   currentCategory,
   isLoading,
 }: {
-  categories: Category[] | undefined;
   currentCategory: string | undefined;
   isLoading: boolean;
 }) {
-  if (isLoading) {
+  const [page, setPage] = useState(1);
+  const { data: response, isLoading: isCategoriesLoading } =
+    usePaginatedProductCategories(page);
+  const categories = response?.data;
+  const meta = response?.meta;
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= (meta?.last_page || 1)) {
+      setPage(newPage);
+    }
+  };
+
+  if (isLoading || isCategoriesLoading) {
     return (
       <div className="hidden md:flex flex-col items-start gap-2 w-48">
         <Skeleton className="h-8 w-32 mb-2" />
@@ -75,9 +95,9 @@ const CategorySidebar = memo(function CategorySidebar({
         </button>
       </Link>
 
-      {categories?.map((category, index) => (
+      {categories?.map((category) => (
         <Link
-          key={`desktop-cat-${category.id}-${index}-${slugify(category.name)}`}
+          key={`desktop-cat-${category.id}-${slugify(category.name)}`}
           href={`/search/${slugify(category.name)}`}
           className="w-full"
         >
@@ -92,6 +112,29 @@ const CategorySidebar = memo(function CategorySidebar({
           </button>
         </Link>
       ))}
+
+      {meta && meta.last_page > 1 && (
+        <div className="w-full pt-4 flex justify-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page === meta.last_page}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 });
@@ -208,7 +251,13 @@ export function ProductListWithSort({
   const { data: categoryData, isLoading: isCategoryLoading } =
     useProductsByCategory(categorySlug || "");
 
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = (current: number, pages: number) => {
+    setPage(current);
+    setTotalPages(pages);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handlePaginationClick = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setPage(newPage);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -240,7 +289,7 @@ export function ProductListWithSort({
     "grid-4":
       "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6",
     "grid-6":
-      "grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6",
+      "grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5  gap-6",
     scroll:
       "flex gap-4 snap-x snap-mandatory overflow-x-auto pb-4 no-scrollbar",
   };
@@ -251,7 +300,6 @@ export function ProductListWithSort({
       <div className="relative">
         <div className="flex gap-8">
           <CategorySidebar
-            categories={categories}
             currentCategory={currentCategory}
             isLoading={isCategoriesLoading}
           />
@@ -287,7 +335,6 @@ export function ProductListWithSort({
       {/* Desktop Layout */}
       <div className="flex gap-8">
         <CategorySidebar
-          categories={categories}
           currentCategory={currentCategory}
           isLoading={isCategoriesLoading}
         />
@@ -351,7 +398,7 @@ export function ProductListWithSort({
               categoryId={categoryId}
               sortBy={sort}
               page={page}
-              onPageChange={setTotalPages}
+              onPageChange={handlePageChange}
               className={className}
               gridCols={gridCols}
               itemsPerPage={itemsPerPage}
@@ -361,40 +408,110 @@ export function ProductListWithSort({
 
           {/* Only show pagination for non-category views */}
           {!categorySlug && totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-8">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => handlePageChange(page - 1)}
-                disabled={page === 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
+            <Pagination className="mt-8">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handlePaginationClick(page - 1);
+                    }}
+                    className={
+                      page === 1 ? "pointer-events-none opacity-50" : ""
+                    }
+                  />
+                </PaginationItem>
 
-              <div className="flex items-center gap-2">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (pageNum) => (
-                    <Button
-                      key={`pagination-${pageNum}`}
-                      variant={pageNum === page ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => handlePageChange(pageNum)}
+                {page > 2 && (
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePaginationClick(1);
+                      }}
                     >
-                      {pageNum}
-                    </Button>
-                  )
+                      1
+                    </PaginationLink>
+                  </PaginationItem>
                 )}
-              </div>
 
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => handlePageChange(page + 1)}
-                disabled={page === totalPages}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+                {page > 3 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+
+                {page > 1 && (
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePaginationClick(page - 1);
+                      }}
+                    >
+                      {page - 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                )}
+
+                <PaginationItem>
+                  <PaginationLink href="#" isActive>
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+
+                {page < totalPages && (
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePaginationClick(page + 1);
+                      }}
+                    >
+                      {page + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                )}
+
+                {page < totalPages - 2 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+
+                {page < totalPages - 1 && (
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePaginationClick(totalPages);
+                      }}
+                    >
+                      {totalPages}
+                    </PaginationLink>
+                  </PaginationItem>
+                )}
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handlePaginationClick(page + 1);
+                    }}
+                    className={
+                      page === totalPages
+                        ? "pointer-events-none opacity-50"
+                        : ""
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           )}
         </div>
 

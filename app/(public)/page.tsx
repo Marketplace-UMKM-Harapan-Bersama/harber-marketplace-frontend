@@ -5,7 +5,7 @@ import { HeroSection } from "@/components/section/hero";
 export default function Home() {
   return (
     <>
-      <div className="flex flex-col gap-4 py-10 container mx-auto">
+      <div className="flex flex-col gap-4 py-10 ">
         <section className="flex flex-col gap-4">
           <HeroSection />
         </section>

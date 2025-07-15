@@ -13,7 +13,7 @@ export default function SearchPage({ searchParams }: SearchPageProps) {
   const { q: searchQuery } = use(searchParams);
 
   return (
-    <div className="container py-6">
+    <div className="py-6">
       {searchQuery ? (
         <>
           <h1 className="text-3xl font-bold mb-6">

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { useCategories } from "@/hooks/use-queries";
 import { Skeleton } from "../ui/skeleton";
-import { SearchIcon } from "lucide-react";
+import { ListIcon, SearchIcon } from "lucide-react";
 import { Category } from "@/lib/types";
 
 export const ProductCategories = () => {
@@ -29,6 +29,15 @@ export const ProductCategories = () => {
           <SearchIcon className="w-4 h-4" />
         </Button>
       </Link>
+      <Link href="/categories">
+        <Button
+          variant="default"
+          className="whitespace-nowrap flex items-center gap-2"
+        >
+          <span className="text-sm">Semua Kategori</span>
+          <ListIcon className="w-4 h-4" />
+        </Button>
+      </Link>
       {isLoading &&
         Array.from({ length: 7 }).map((_, idx) => (
           <Skeleton key={idx} className="w-24 h-9" />
@@ -41,6 +50,15 @@ export const ProductCategories = () => {
             </Button>
           </Link>
         ))}
+      <Link href="/categories">
+        <Button
+          variant="default"
+          className="whitespace-nowrap flex items-center gap-2  "
+        >
+          <span className="text-sm">Lihat Semua Kategori</span>
+          <ListIcon className="w-4 h-4" />
+        </Button>
+      </Link>
     </div>
   );
 };
